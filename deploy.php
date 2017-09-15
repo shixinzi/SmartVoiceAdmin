@@ -26,8 +26,10 @@ desc('Restart PHP-FPM service');
 task('php-fpm:restart', function () {
     run('sudo systemctl restart php-fpm.service');
 });
+
+
 after('deploy:symlink', 'php-fpm:restart');
 
 after('deploy:failed', 'deploy:unlock');
 
-//before('deploy:symlink', 'artisan:migrate');
+before('deploy:symlink', 'artisan:migrate');
