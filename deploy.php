@@ -16,8 +16,8 @@ set('allow_anonymous_stats', false);
 
 host('120.27.239.106')
     ->port('56413')
-    ->user('root')
-    ->stage('production')
+    ->user('chenshengwen')
+    ->stage('prod')
     ->set('deploy_path', '/hwdata/www/SmartVoiceAdmin');
 
 // Tasks
