@@ -37,6 +37,6 @@ class TestEcho extends Command
      */
     public function handle()
     {
-        $this->info(env('APP_KEY'));
+        $this->info('Hello word!');
     }
 }
