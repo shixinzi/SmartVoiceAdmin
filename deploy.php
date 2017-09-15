@@ -6,7 +6,7 @@ require 'recipe/laravel.php';
 // Configuration
 
 set('repository', 'git@github.com:superwen/SmartVoiceAdmin.git');
-set('git_tty', true); // [Optional] Allocate tty for git on first deployment
+set('git_tty', true);
 add('shared_files', []);
 add('shared_dirs', []);
 add('writable_dirs', []);
@@ -14,28 +14,20 @@ set('allow_anonymous_stats', false);
 
 // Hosts
 
-host('project.com')
+host('120.27.239.106')
+    ->port('56413')
+    ->user('root')
     ->stage('production')
-    ->set('deploy_path', '/var/www/project.com');
-    
-host('beta.project.com')
-    ->stage('beta')
-    ->set('deploy_path', '/var/www/project.com');  
-
+    ->set('deploy_path', '/hwdata/www/SmartVoiceAdmin');
 
 // Tasks
 
 desc('Restart PHP-FPM service');
 task('php-fpm:restart', function () {
-    // The user must have rights for restart service
-    // /etc/sudoers: username ALL=NOPASSWD:/bin/systemctl restart php-fpm.service
     run('sudo systemctl restart php-fpm.service');
 });
 after('deploy:symlink', 'php-fpm:restart');
 
-// [Optional] if deploy fails automatically unlock.
 after('deploy:failed', 'deploy:unlock');
 
-// Migrate database before symlink new release.
-
-before('deploy:symlink', 'artisan:migrate');
+//before('deploy:symlink', 'artisan:migrate');
