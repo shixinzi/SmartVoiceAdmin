@@ -14,6 +14,17 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\TestEcho::class,
+        Commands\CronUpdateHdpChannels::class,
+        Commands\CronUpdateAllQQAlbum::class,
+        Commands\CronMakeSearchDict::class,
+        Commands\CronUpdateApps::class,
+        Commands\CronSyncChannelFromHuan::class,
+        Commands\CronSyncProgramFromHuan::class,
+        Commands\CronUpdateChannelHotFromHuan::class,
+        Commands\CronUpdateLiveProgram::class,
+        Commands\CronUpdateWikiExtendInfo::class,
+        Commands\CronMatchWikiAndQQAlbum::class,
+        Commands\CronUpdateQQAlbumHotFromQQ::class,
     ];
 
     /**

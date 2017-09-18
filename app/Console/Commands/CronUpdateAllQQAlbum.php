@@ -3,15 +3,17 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\QQMap;
+use App\Jobs\GetQQAlbumsByMap;
 
-class TestEcho extends Command
+class CronUpdateAllQQAlbum extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'test:echo';
+    protected $signature = 'cron:UpdateAllQQAlbum';
 
     /**
      * The console command description.
@@ -37,20 +39,12 @@ class TestEcho extends Command
      */
     public function handle()
     {
-        $this->info('Hello word!');
-        $this->initVoiceLocalCommands();
-    }
-
-    public function initVoiceLocalCommands()
-    {
-        $commands = [
-            ['word' => '关机',  'target' => []],
-            ['word' => '返回桌面',  'target' => []],
-            ['word' => '商店', 'target' => []],
-            ['word' => '我的应用', 'target' => []]
-        ];
-        foreach($commands as $command) {
-            \App\Models\VoiceLocalCommand::updateOrCreate($command);
+        //$qqMaps = QQMap::all();
+        $qqMaps = QQMap::whereIn("type", ['movie', 'tv'])->get();
+        foreach($qqMaps as $qqMap) {
+            $this->info($qqMap->loc);
+            dispatch(new GetQQAlbumsByMap($qqMap));
         }
+        exit;
     }
 }

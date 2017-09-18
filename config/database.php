@@ -78,6 +78,18 @@ return [
             'prefix' => '',
         ],
 
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => env('MGDB_HOST', 'localhost'),
+            'port'     => env('MGDB_PORT', 27017),
+            'database' => env('MGDB_DATABASE'),
+            'username' => env('MGDB_USERNAME'),
+            'password' => env('MGDB_PASSWORD'),
+            'options'  => [
+                'database' => 'admin'
+            ]
+        ],
+
     ],
 
     /*

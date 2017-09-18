@@ -18,3 +18,5 @@ Route::get('/', function () {
 Route::get('/test',  function() {
    return 'Test!';
 });
+
+Route::post('api/v1', 'ApiController@v1Post');
