@@ -38,6 +38,10 @@ class TestEcho extends Command
     public function handle()
     {
         $this->info('Hello word!');
+
+        if (preg_match('/^我(要|想)看(\S+)第(\S+)(集|期)/', "我要看楚乔传第1集", $matches)) {
+            dd($matches);
+        }
         $this->initVoiceLocalCommands();
     }
 

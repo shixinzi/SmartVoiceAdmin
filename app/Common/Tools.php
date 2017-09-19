@@ -4,6 +4,13 @@ namespace app\Common;
 
 class Tools
 {
+    static public function cnNum2Num($cnNum)
+    {
+        $cnNums = ['零','一','二','三','四','五','六','七','八','九','十'];
+        $enNums = [0,1,2,3,4,5,6,7,8,9,0];
+        return str_replace($cnNums, $enNums, $cnNum);
+    }
+
     static public function getDatesByNums($dayNumsStr, $splide = ',', $dayFormat = 'Y-m-d')
     {
         $days = [];

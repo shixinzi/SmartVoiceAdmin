@@ -16,6 +16,7 @@ use App\Models\App;
 use App\Models\VoiceSearchLog;
 use App\Models\VoiceLocalCommand;
 use Log;
+use App\Common\Tools;
 
 class ApiController extends Controller
 {
@@ -143,7 +144,7 @@ class ApiController extends Controller
             'DefaultLiveApp' => 'hdp',
             'DefaultVodApp' => 'opentv',
             'Vocie' => [
-                'LocalCommands' => VoiceLocalCommand::all()->map(function($item, $key) {
+                'LocalCommands' => VoiceLocalCommand::all()->map(function ($item, $key) {
                     return ['word' => $item->word, 'taget' => $item->target];
                 }),
             ]
@@ -153,17 +154,32 @@ class ApiController extends Controller
 
     protected function searchTVAndVod($text)
     {
-        if (preg_match('/^我(要|想)看(\S+)/', $text, $matches)) {
-            if (isset($matches[2])) {
-                $key = $matches[2];
-                $channel = HdpChannel::where("name", $key)->first();
-                if ($channel) {
-                    return $this->formatChannel2AI($channel);
-                }
-                $qqAlbum = QQAlbum::where("album_name", $key)->first();
-                if ($qqAlbum) {
-                    return $this->formatQQAlbum2AI($qqAlbum);
-                }
+        if (preg_match('/^我(要|想)看(\S+)/', $text, $matches) && isset($matches[2])) {
+            $key = trim($matches[2]);
+            $channel = HdpChannel::where("name", $key)->first();
+            if ($channel) {
+                return $this->formatChannel2AI($channel);
+            }
+            if (preg_match('/^(\S+)第(\S+)(集|期)/', $key, $matches2)) {
+                Log::info($matches2[1]."\t".$matches2[2]);
+                $key = trim($matches2[1]);
+                $num = Tools::cnNum2Num(trim($matches2[2]));
+            } else {
+                Log::info("-------------");
+                $num = '1';
+            }
+            $qqAlbum = QQAlbum::where("album_name", $key)->first();
+            if (!$qqAlbum) {
+                $this->setErrArray(1002, '没有找到你想要的结果!');
+                return false;
+            }
+            $qqAlbumVideo = QQAlbumVideo::where("album_id", $qqAlbum->album_id)
+                ->where('play_order', $num)->first();
+            if (!$qqAlbumVideo) {
+                $this->setErrArray(1002, '没有找到你想要的结果!');
+                return false;
+            } else {
+                return $this->formatQQAlbumVideo2AI($qqAlbumVideo);
             }
         } else {
             return false;
@@ -199,13 +215,14 @@ class ApiController extends Controller
     {
         return [
             [
-                "type" => "channel",
-                "target_type" => "androidApp",
-                'channel_name' => $channel->name,
-                'channel_num' => $channel->num,
-                'package_name' => 'com.hdp.hd.hdp',
-                'setClassName' => [["hdpfans.com" => "hdp.player.StartActivity"]],
-                'putExtra' => [["ChannelNum" => $channel->num]]
+                'type' => 'androidApp',
+                'name' => $channel->name,
+                'start_type' => 'mainActivity',   //activity,action,broadcast,service
+                'package_name' => 'hdpfans.com',
+                'class_name' => 'hdp.player.StartActivity',
+                'extra' => [
+                    ['key' => "ChannelNum", 'value' => $channel->num]
+                ]
             ]
         ];
     }
@@ -214,14 +231,31 @@ class ApiController extends Controller
     {
         return [
             [
-                "type" => "QQAlbum",
-                "target_type" => "androidApp",
-                'album_name' => $album->album_name,
-                'album_id' => $album->album_id,
-                'package_name' => 'com.tencent.hd.beiji',
-                "intent_type" => 'activity',
-                'intent_active' => 'com.tencent.hd.beiji.MAIN.ACTIVITY',
-                'intent_params' => [],
+                'type' => 'androidApp',
+                'name' => $album->name,
+                'start_type' => 'action',   //activity,action,broadcast,service
+                'package_name' => 'com.ktcp.video',
+                'action_name' => 'com.tencent.qqlivetv.open',
+                'extra' => [
+                    ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $album->album_id . '&video_name=xxx&cover_id=xxx&cover_pulltype=1"']
+                ]
+            ]
+        ];
+    }
+
+    protected function formatQQAlbumVideo2AI($video)
+    {
+
+        return [
+            [
+                'type' => 'androidApp',
+                'name' => $video->video_name,
+                'start_type' => 'action',   //activity,action,broadcast,service
+                'package_name' => 'com.ktcp.video',
+                'action_name' => 'com.tencent.qqlivetv.open',
+                'extra' => [
+                    ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=xxx&cover_pulltype=1"']
+                ]
             ]
         ];
     }
@@ -404,7 +438,7 @@ class ApiController extends Controller
     {
         $page = 1;
         $pagesize = 12;
-        $skip = ($page-1)*$pagesize;
+        $skip = ($page - 1) * $pagesize;
         $wikiFollows = WikiFollow::orderBy('rating', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($wikiFollows as $key => $wikiFollow) {
             $wiki = [
@@ -428,7 +462,7 @@ class ApiController extends Controller
     {
         $page = 1;
         $pagesize = 12;
-        $skip = ($page-1)*$pagesize;
+        $skip = ($page - 1) * $pagesize;
         $wikiFormers = WikiFormer::orderBy('rating', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($wikiFormers as $key => $wikiFormer) {
             $wiki = [
@@ -452,9 +486,9 @@ class ApiController extends Controller
     {
         $page = 1;
         $pagesize = 12;
-        $skip = ($page-1)*$pagesize;
+        $skip = ($page - 1) * $pagesize;
         $type = isset($this->param['type']) ? $this->param['type'] : null;
-        if($type && in_array($type, ['movie' , 'tv' ,'doc' , 'cartoon', 'variety', 'doc'])) {
+        if ($type && in_array($type, ['movie', 'tv', 'doc', 'cartoon', 'variety', 'doc'])) {
             $albums = QQAlbum::where('type', $type)->orderBy('hot_num', 'desc')->skip($skip)->take($pagesize)->get();
         } else {
             $albums = QQAlbum::orderBy('hot_num', 'desc')->skip($skip)->take($pagesize)->get();
