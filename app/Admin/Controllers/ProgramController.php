@@ -77,7 +77,7 @@ class ProgramController extends Controller
             $grid->column('start_time', '开始时间');
             $grid->column('wiki_id', '关联wiki');
             $grid->column('tags', '节目标签')->display(function ($tags) {
-                return implode(";", array_slice($tags, 0, 3));
+                return $tags ? implode(";", array_slice($tags, 0, 3)) : '';
             });
 
             $grid->updated_at('更新时间');
