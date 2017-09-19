@@ -72,7 +72,7 @@ class ProgramController extends Controller
     protected function grid()
     {
         return Admin::grid(Program::class, function (Grid $grid) {
-
+            $grid->model()->orderBy('date', 'desc');
             $grid->column('name', '节目名称');
             $grid->column('start_time', '开始时间');
             $grid->column('wiki_id', '关联wiki');
