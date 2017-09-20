@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Channel;
 use Illuminate\Console\Command;
 use App\Models\HdpChannel;
 use Log;
@@ -65,6 +66,20 @@ class CronUpdateHdpChannels extends Command
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return null;
+        }
+
+        $channelObjs = Channel::all();
+        foreach($channelObjs as $channelObj) {
+            $hdpChannelObj = HdpChannel::where('name', $channelObj->name)->first();
+            if($hdpChannelObj) {
+                HdpChannel::where('channel_code', $channelObj->code)
+                    ->where('name', '!=', $channelObj->name)->update(['channel_code' => null]);
+                $this->info($channelObj->name."++++++");
+                $hdpChannelObj->channel_code = $channelObj->code;
+                $hdpChannelObj->save();
+            } else {
+                $this->info($channelObj->name."-------");
+            }
         }
     }
 

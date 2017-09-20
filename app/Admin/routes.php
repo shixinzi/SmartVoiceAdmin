@@ -13,6 +13,7 @@ Route::group([
     $router->get('/', 'HomeController@index');
 
     $router->resource('channels', ChannelController::class);
+    $router->resource('channelMatchDefines', ChannelMatchDefineController::class);
     $router->resource('hdpChannels', HdpChannelController::class);
     $router->resource('programs', ProgramController::class);
 
