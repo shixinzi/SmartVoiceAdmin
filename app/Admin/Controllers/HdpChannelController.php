@@ -77,6 +77,7 @@ class HdpChannelController extends Controller
             $grid->column('name', '名称');
             $grid->column('num', '频道号');
             $grid->column('type', '频道类型');
+            $grid->column('channel_code', 'Code');
             $grid->created_at();
             $grid->updated_at();
 

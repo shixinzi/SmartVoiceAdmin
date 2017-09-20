@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Channel;
 use Illuminate\Console\Command;
 use App\Models\HdpChannel;
+use App\Models\ChannelMatchDefine;
 use Log;
 
 class CronUpdateHdpChannels extends Command
@@ -52,10 +53,21 @@ class CronUpdateHdpChannels extends Command
                 foreach($class->channel as $channel) {
                     $channelNum = $this->xmlAttribute($channel, '频道号');
                     $channelName = $this->xmlAttribute($channel, '频道名称');
+                    $channelCode = null;
                     $this->info($channelName."\t".$channelNum);
+
+                    $channelObj = Channel::where('name', $channelName)->first();
+                    if(!$channelObj) {
+                        $channelMatchDefineObj = ChannelMatchDefine::where('channel_name', $channelName)->first();
+                        if($channelMatchDefineObj) {
+                            $channelCode = $channelMatchDefineObj['code'];
+                        }
+                    } else {
+                        $channelCode = $channelObj['code'];
+                    }
                     HdpChannel::updateOrCreate(
                         ['name' => $channelName],
-                        ['num' => $channelNum, 'type' => $channelType]
+                        ['num' => $channelNum, 'type' => $channelType , 'channel_code' => $channelCode]
                     );
                 }
 
@@ -66,20 +78,6 @@ class CronUpdateHdpChannels extends Command
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return null;
-        }
-
-        $channelObjs = Channel::all();
-        foreach($channelObjs as $channelObj) {
-            $hdpChannelObj = HdpChannel::where('name', $channelObj->name)->first();
-            if($hdpChannelObj) {
-                HdpChannel::where('channel_code', $channelObj->code)
-                    ->where('name', '!=', $channelObj->name)->update(['channel_code' => null]);
-                $this->info($channelObj->name."++++++");
-                $hdpChannelObj->channel_code = $channelObj->code;
-                $hdpChannelObj->save();
-            } else {
-                $this->info($channelObj->name."-------");
-            }
         }
     }
 
