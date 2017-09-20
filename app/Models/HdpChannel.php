@@ -10,6 +10,6 @@ class HdpChannel extends Eloquent
     protected $connection = 'mongodb';
     protected $collection = 'hdpChannel';
 
-    protected $fillable = ['name' , 'num', 'type'];
+    protected $fillable = ['name' , 'num', 'type' ,'channel_code'];
 
 }
