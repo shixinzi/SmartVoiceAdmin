@@ -39,10 +39,19 @@ class TestEcho extends Command
     {
         $this->info('Hello word!');
 
-        if (preg_match('/^我(要|想)看(\S+)第(\S+)(集|期)/', "我要看楚乔传第1集", $matches)) {
-            dd($matches);
+        $contents = file_get_contents('/Users/superwen/Desktop/channelMatchDefine.csv');
+        if($contents && $lines = explode("\n", $contents)) {
+            foreach($lines as $line) {
+                $this->info($line);
+                $cols = explode(",", $line);
+                if($cols && isset($cols[2])) {
+                    \App\Models\ChannelMatchDefine::firstOrCreate(
+                        ['channel_name' => $cols[1]],
+                        ['channel_code' => $cols[2]]
+                    );
+                }
+            }
         }
-        $this->initVoiceLocalCommands();
     }
 
     public function initVoiceLocalCommands()

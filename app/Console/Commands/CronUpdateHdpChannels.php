@@ -51,19 +51,23 @@ class CronUpdateHdpChannels extends Command
             foreach ($channel_list->class as $class) {
                 $channelType = $this->xmlAttribute($class, '节目分类');
                 foreach($class->channel as $channel) {
-                    $channelNum = $this->xmlAttribute($channel, '频道号');
-                    $channelName = $this->xmlAttribute($channel, '频道名称');
+                    $channelNum = trim($this->xmlAttribute($channel, '频道号'));
+                    $channelName = trim($this->xmlAttribute($channel, '频道名称'));
                     $channelCode = null;
-                    $this->info($channelName."\t".$channelNum);
 
                     $channelObj = Channel::where('name', $channelName)->first();
                     if(!$channelObj) {
                         $channelMatchDefineObj = ChannelMatchDefine::where('channel_name', $channelName)->first();
                         if($channelMatchDefineObj) {
-                            $channelCode = $channelMatchDefineObj['code'];
+                            $channelCode = $channelMatchDefineObj['channel_code'];
                         }
                     } else {
                         $channelCode = $channelObj['code'];
+                    }
+                    if($channelCode) {
+                        $this->info($channelName . "\t" . $channelNum ."\t" . $channelCode);
+                    } else {
+                        $this->error($channelName . "\t" . $channelNum);
                     }
                     HdpChannel::updateOrCreate(
                         ['name' => $channelName],
