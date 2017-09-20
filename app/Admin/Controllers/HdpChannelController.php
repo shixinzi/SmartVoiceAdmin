@@ -79,6 +79,11 @@ class HdpChannelController extends Controller
             $grid->column('type', '频道类型');
             $grid->created_at();
             $grid->updated_at();
+
+            $grid->filter(function($filter){
+                $filter->disableIdFilter();
+                $filter->like('name', '名称');
+            });
         });
     }
 

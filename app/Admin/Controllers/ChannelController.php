@@ -80,6 +80,13 @@ class ChannelController extends Controller
             });
             $grid->created_at();
             $grid->updated_at();
+
+            $grid->filter(function($filter){
+                $filter->disableIdFilter();
+                $filter->like('name', '名称');
+                $filter->equal('code', 'Code');
+                $filter->is('tags', '分类')->select(['cctv' => 'cctv', 'tv' => 'tv']);
+            });
         });
     }
 
