@@ -16,6 +16,7 @@ use App\Models\App;
 use App\Models\VoiceSearchLog;
 use App\Models\VoiceLocalCommand;
 use Log;
+use Cache;
 use App\Common\Tools;
 
 class ApiController extends Controller
@@ -161,7 +162,7 @@ class ApiController extends Controller
                 return $this->formatChannel2AI($channel);
             }
             if (preg_match('/^(\S+)第(\S+)(集|期)/', $key, $matches2)) {
-                Log::info($matches2[1]."\t".$matches2[2]);
+                Log::info($matches2[1] . "\t" . $matches2[2]);
                 $key = trim($matches2[1]);
                 $num = Tools::cnNum2Num(trim($matches2[2]));
             } else {
@@ -217,7 +218,7 @@ class ApiController extends Controller
             [
                 'type' => 'androidApp',
                 'name' => $channel->name,
-                'start_type' => 'mainActivity',   //activity,action,broadcast,service
+                'start_type' => 'activity',   //mainActivity,activity,action,broadcast,service
                 'package_name' => 'hdpfans.com',
                 'class_name' => 'hdp.player.StartActivity',
                 'extra' => [
@@ -289,32 +290,19 @@ class ApiController extends Controller
 
     protected function GetChannels()
     {
-        $channelObjs = Channel::where([])->get();
+        $channelObjs = Channel::where([])->orderBy("hot", 'desc')->get();
         $channels = [];
-        foreach ($channelObjs as $key => $channelObj) {
-            $channels[$key] = [
-                'name' => $channelObj->name,
-                'code' => $channelObj->code,
-                'logo' => $this->getChannelLogo($channelObj->logo),
-                'tags' => $channelObj->tags,
-                'hot' => $channelObj->hot,
-            ];
-            if (isset($this->param['showlive']) && boolval($this->param['showlive'])) {
-                $liveProgram = LiveProgram::where('channel_code', $channelObj->code)->first();
-                if ($liveProgram) {
-                    $channels[$key]['program'] = [
-                        "name" => $liveProgram->program_name,
-                        "start_time" => date("Y-m-d H:i:s", $liveProgram->start_time),
-                        "end_time" => date("Y-m-d H:i:s", $liveProgram->end_time),
-                        "wiki_id" => $liveProgram->wiki_id,
-                        "wiki_title" => $liveProgram->wiki_title,
-                        "wiki_cover" => $this->getWikiCover($liveProgram->wiki_cover),
-                        "next_name" => "",
-                        "next_wiki_id" => ""
-                    ];
-                } else {
-                    $channels[$key]['program'] = [];
-                }
+        if ($channelObjs) {
+            foreach ($channelObjs as $key => $channelObj) {
+                array_push($channels, [
+                    'name' => $channelObj->name,
+                    'code' => $channelObj->code,
+                    'logo' => $this->getChannelLogo($channelObj->logo),
+                    'tags' => $channelObj->tags,
+                    'hot' => $channelObj->hot,
+                    'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
+                    'liveProgram' => Tools::strToBoolean($this->param['showlive']) ? $this->getLiveProgramByChannelCode($channelObj->code) : null
+                ]);
             }
         }
         $this->backJson['total'] = count($channels);
@@ -324,33 +312,28 @@ class ApiController extends Controller
 
     protected function GetChannelsByRecommended()
     {
-        $channelCodes = ['dragontv', 'c39a7a374d888bce3912df71bcb0d580', '590e187a8799b1890175d25ec85ea352', '5dfcaefe6e7203df9fbe61ffd64ed1c4', 'antv'];
+        $channelCodes = [
+            'dragontv',
+            'c39a7a374d888bce3912df71bcb0d580',
+            '590e187a8799b1890175d25ec85ea352',
+            '5dfcaefe6e7203df9fbe61ffd64ed1c4',
+            'antv',
+            'cctv1',
+            'cctv4_asia',
+            'cctv8'
+        ];
         $channelObjs = Channel::whereIn('code', $channelCodes)->get();
         $channels = [];
         foreach ($channelObjs as $key => $channelObj) {
-            $channels[$key] = [
+            array_push($channels, [
                 'name' => $channelObj->name,
+                'code' => $channelObj->code,
                 'logo' => $this->getChannelLogo($channelObj->logo),
                 'tags' => $channelObj->tags,
                 'hot' => $channelObj->hot,
-            ];
-            if (isset($this->param['showlive']) && boolval($this->param['showlive'])) {
-                $liveProgram = LiveProgram::where('channel_code', $channelObj->code)->first();
-                if ($liveProgram) {
-                    $channels[$key]['program'] = [
-                        "name" => $liveProgram->program_name,
-                        "start_time" => date("Y-m-d H:i:s", $liveProgram->start_time),
-                        "end_time" => date("Y-m-d H:i:s", $liveProgram->end_time),
-                        "wiki_id" => $liveProgram->wiki_id,
-                        "wiki_title" => $liveProgram->wiki_title,
-                        "wiki_cover" => $this->getWikiCover($liveProgram->wiki_cover),
-                        "next_name" => "",
-                        "next_wiki_id" => ""
-                    ];
-                } else {
-                    $channels[$key]['program'] = [];
-                }
-            }
+                'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
+                'liveProgram' => Tools::strToBoolean($this->param['showlive']) ? $this->getLiveProgramByChannelCode($channelObj->code) : null
+            ]);
         }
         $this->backJson['total'] = count($channels);
         $this->backJson['data'] = $channels;
@@ -360,7 +343,7 @@ class ApiController extends Controller
     protected function getChannelLogo($logo)
     {
         return $logo;
-        return 'http://image.epg.huan.tv/2012/12/12/' . $logo;
+        //return 'http://image.epg.huan.tv/2012/12/12/' . $logo;
     }
 
     protected function GetLivePrograms()
@@ -375,11 +358,14 @@ class ApiController extends Controller
             $livePrograms[$key] = [
                 'program_name' => $liveProgramObj->program_name,
                 'channel_code' => $liveProgramObj->channel_code,
+                'start_time' => date('Y-m-d H:i:s', $liveProgramObj->start_time),
+                'end_time' => date('Y-m-d H:i:s', $liveProgramObj->end_time),
                 'wiki_id' => $liveProgramObj->wiki_id,
                 "wiki_title" => $liveProgramObj->wiki_title,
                 "wiki_cover" => $this->getWikiCover($liveProgramObj->wiki_cover),
                 'tags' => $liveProgramObj->tags,
                 'hot' => $liveProgramObj->hot,
+                'targetActions' => $this->getTargetActionObjsByChannelCode($liveProgramObj->channel_code),
             ];
         }
         $this->backJson['page'] = $page;
@@ -412,18 +398,18 @@ class ApiController extends Controller
         $date = isset($this->param['date']) ? $this->param['date'] : date('Y-m-d');
         $programs = [];
         $programObjs = Program::where('channel_code', $channel_code)->where('date', $date)->get();
-        foreach ($programObjs as $key => $programObjs) {
+        foreach ($programObjs as $key => $programObj) {
             $program = [
-                'program_name' => $programObjs->name,
-                'channel_code' => $programObjs->channel_code,
-                'start_time' => date('Y-m-d H:i:s', $programObjs->start_time),
-                'end_time' => date('Y-m-d H:i:s', $programObjs->end_time),
-                'tags' => $programObjs->tags,
+                'program_name' => $programObj->name,
+                'channel_code' => $programObj->channel_code,
+                'start_time' => date('Y-m-d H:i:s', $programObj->start_time),
+                'end_time' => date('Y-m-d H:i:s', $programObj->end_time),
+                'tags' => $programObj->tags,
             ];
-            if ($programObjs->wiki_id && ($wikiObj = Wiki::getOneById($programObjs->wiki_id))) {
-                array_add($program, "wiki_id", $programObjs->wiki_id);
-                array_add($program, "wiki_title", $wikiObj->title);
-                array_add($program, "wiki_cover", $this->getWikiCover($wikiObj->cover));
+            if ($programObj->wiki_id && ($wikiObj = Wiki::getOneById($programObj->wiki_id))) {
+                $program["wiki_id"] = $programObj->wiki_id;
+                $program["wiki_title"] = $wikiObj->title;
+                $program["wiki_cover"] = $this->getWikiCover($wikiObj->cover);
             }
             $programs[$key] = $program;
         }
@@ -510,5 +496,42 @@ class ApiController extends Controller
         $this->backJson['total'] = count($wikis);
         $this->backJson['pagetotal'] = 1;
         $this->backJson['data'] = $wikis;
+    }
+
+    protected function getTargetActionObjsByChannelCode($channel_code)
+    {
+        $key = 'ChannelTargetActions_' . $channel_code;
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        } else {
+            $targetActions = [];
+            $targetActionObjs = HdpChannel::where("channel_code", $channel_code)->get();
+            if ($targetActionObjs) {
+                foreach ($targetActionObjs as $targetActionObj) {
+                    array_push($targetActions, $this->formatChannel2AI($targetActionObj));
+                }
+            }
+            Cache::put($key, $targetActions);
+            return $targetActions;
+        }
+    }
+
+    protected function getLiveProgramByChannelCode($channel_code)
+    {
+        $liveProgram = LiveProgram::where('channel_code', $channel_code)->first();
+        if ($liveProgram) {
+            return [
+                "name" => $liveProgram->program_name,
+                "start_time" => date("Y-m-d H:i:s", $liveProgram->start_time),
+                "end_time" => date("Y-m-d H:i:s", $liveProgram->end_time),
+                "wiki_id" => $liveProgram->wiki_id,
+                "wiki_title" => $liveProgram->wiki_title,
+                "wiki_cover" => $this->getWikiCover($liveProgram->wiki_cover),
+                "next_name" => "",
+                "next_wiki_id" => ""
+            ];
+        } else {
+            return null;
+        }
     }
 }

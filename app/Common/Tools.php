@@ -4,6 +4,11 @@ namespace app\Common;
 
 class Tools
 {
+    static public function strToBoolean($str)
+    {
+        return isset($str) && in_array($str, ['yes', 'true']);
+    }
+
     static public function cnNum2Num($cnNum)
     {
         $cnNums = ['零','一','二','三','四','五','六','七','八','九','十'];

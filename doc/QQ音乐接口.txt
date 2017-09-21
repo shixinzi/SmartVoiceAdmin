@@ -1,0 +1,17 @@
+Step1: 获取歌曲列表及歌曲信息
+http://openapi.tencentyun.com/v3/music/get_list 
+
+Step2: 获取指定歌曲片段的url
+http://openapi.tencentyun.com/v3/music/get_clip 
+
+
+openid
+openkey
+appid = 1106354339
+appkey = FgfNjaEB0cBsC0lD
+sig
+pf
+
+
+
+1106354339

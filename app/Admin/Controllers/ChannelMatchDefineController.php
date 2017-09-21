@@ -78,6 +78,12 @@ class ChannelMatchDefineController extends Controller
             $grid->column('sp', 'SP');
             $grid->created_at();
             $grid->updated_at();
+
+            $grid->filter(function($filter){
+                $filter->disableIdFilter();
+                $filter->like('channel_name', '名称');
+                $filter->equal('channel_code', 'Code');
+            });
         });
     }
 

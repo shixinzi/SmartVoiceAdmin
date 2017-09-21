@@ -72,14 +72,18 @@ class ChannelController extends Controller
     protected function grid()
     {
         return Admin::grid(Channel::class, function (Grid $grid) {
-
+            $grid->model()->orderBy('hot', 'desc');
             $grid->column('name', '名称');
             $grid->column('code', 'Code');
-            $grid->column('logo', 'Loog')->display(function($logo) {
+            $grid->column('logo', 'Logo')->display(function($logo) {
                 return '<img src="'.$logo.'" width="100px;">';
             });
-            $grid->created_at();
-            $grid->updated_at();
+            $grid->column('tags', '类型')->display(function($tags) {
+                return implode(';', $tags);
+            });
+            $grid->column('hot', '热度');
+            //$grid->created_at();
+            $grid->updated_at('最后更新');
 
             $grid->filter(function($filter){
                 $filter->disableIdFilter();

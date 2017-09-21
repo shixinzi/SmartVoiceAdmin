@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Cache;
+use Log;
 
 /*
  * 维基
@@ -33,12 +34,20 @@ class Wiki extends Eloquent
 
     public static function getOneById($id)
     {
-        if(!Cache::has("mWikiGetOne_".$id)) {
+        $id = "541295fa2dd6fc7a0631a644";
+        $ckey = 'mWikiGetOne_'.$id;
+        if(!Cache::has($ckey)) {
+            Log::debug("222-".$id);
             $wiki = Wiki::find($id);
-            Cache::put("mWikiGetOne_".$id, $wiki);
-            return $wiki;
+            if($wiki) {
+                Log::debug("444-".$id);
+                Cache::put($ckey, $wiki, 60);
+                return $wiki;
+            }
+            return null;
         } else {
-            return Cache::get("mWikiGetOne_".$id);
+            Log::debug("333-".$id);
+            return Cache::get($ckey);
         }
     }
 
