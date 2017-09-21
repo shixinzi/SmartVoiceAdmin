@@ -53,4 +53,6 @@ class QQAlbum extends Eloquent
     {
         return $this->hasMany(QQAlbumVideo::class, 'album_id', 'album_id');
     }
+
+    protected $hidden = ["_id"];
 }

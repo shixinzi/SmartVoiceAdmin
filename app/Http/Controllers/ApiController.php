@@ -109,6 +109,7 @@ class ApiController extends Controller
             'GetHotWikiFollows', //获取热门回看wiki
             'GetHotWikiFormers', //获取热门预告wiki,
             'GetHotVods', //获取热门点播
+            'GetQQAlbumInfo', //获取QQAlbum信息
         ];
     }
 
@@ -292,6 +293,7 @@ class ApiController extends Controller
     {
         $channelObjs = Channel::where([])->orderBy("hot", 'desc')->get();
         $channels = [];
+        $showlive = isset($this->param['showlive']) ? Tools::strToBoolean($this->param['showlive']) : null;
         if ($channelObjs) {
             foreach ($channelObjs as $key => $channelObj) {
                 array_push($channels, [
@@ -301,7 +303,7 @@ class ApiController extends Controller
                     'tags' => $channelObj->tags,
                     'hot' => $channelObj->hot,
                     'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
-                    'liveProgram' => Tools::strToBoolean($this->param['showlive']) ? $this->getLiveProgramByChannelCode($channelObj->code) : null
+                    'liveProgram' =>  $showlive ? $this->getLiveProgramByChannelCode($channelObj->code) : null
                 ]);
             }
         }
@@ -324,6 +326,7 @@ class ApiController extends Controller
         ];
         $channelObjs = Channel::whereIn('code', $channelCodes)->get();
         $channels = [];
+        $showlive = isset($this->param['showlive']) ? Tools::strToBoolean($this->param['showlive']) : null;
         foreach ($channelObjs as $key => $channelObj) {
             array_push($channels, [
                 'name' => $channelObj->name,
@@ -332,7 +335,7 @@ class ApiController extends Controller
                 'tags' => $channelObj->tags,
                 'hot' => $channelObj->hot,
                 'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
-                'liveProgram' => Tools::strToBoolean($this->param['showlive']) ? $this->getLiveProgramByChannelCode($channelObj->code) : null
+                'liveProgram' => $showlive ? $this->getLiveProgramByChannelCode($channelObj->code) : null
             ]);
         }
         $this->backJson['total'] = count($channels);
@@ -474,7 +477,7 @@ class ApiController extends Controller
         $pagesize = 12;
         $skip = ($page - 1) * $pagesize;
         $type = isset($this->param['type']) ? $this->param['type'] : null;
-        if ($type && in_array($type, ['movie', 'tv', 'doc', 'cartoon', 'variety', 'doc'])) {
+        if ($type && in_array($type, ['movie', 'tv', 'doc', 'cartoon', 'variety'])) {
             $albums = QQAlbum::where('type', $type)->orderBy('hot_num', 'desc')->skip($skip)->take($pagesize)->get();
         } else {
             $albums = QQAlbum::orderBy('hot_num', 'desc')->skip($skip)->take($pagesize)->get();
@@ -482,11 +485,11 @@ class ApiController extends Controller
         foreach ($albums as $key => $album) {
             $wiki = [
                 'model' => 'qqalbum',
-                'wiki_id' => $album->album_id,
-                'wiki_title' => $album->album_name,
-                'wiki_model' => $album->type,
-                'wiki_tags' => $album->sub_type,
-                'wiki_cover' => $album->album_verpic,
+                'album_id' => $album->album_id,
+                'album_name' => $album->album_name,
+                'type' => $album->type,
+                'tags' => $album->sub_type,
+                'album_verpic' => $album->album_verpic,
                 'hot_num' => $album->hot_num,
             ];
             $wikis[$key] = $wiki;
@@ -533,5 +536,25 @@ class ApiController extends Controller
         } else {
             return null;
         }
+    }
+
+    public function GetQQAlbumInfo()
+    {
+        if(!isset($this->param['album_id'])) {
+            $this->setErrArray(1000, '错误的参数album_id');
+            return false;
+        }
+        $album_id = $this->param['album_id'];
+        $albumObj = QQAlbum::with('videos')->where('album_id', $album_id)->first();
+        $data = [];
+        if(!$albumObj) {
+            $this->setErrArray(1000, '没有找到相关QQAlbum');
+            return false;
+        }
+        $albumVideoObj = QQAlbumVideo::where('album_id', $album_id)
+                            ->orderBy('play_order', 'asc')->get();
+
+        $this->backJson['data'] = $albumObj->toArray();
+        return false;
     }
 }

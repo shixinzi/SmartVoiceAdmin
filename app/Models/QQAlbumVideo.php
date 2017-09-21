@@ -32,5 +32,7 @@ class QQAlbumVideo extends Eloquent
         'partner_vid',
         'episode'
     ];
+
+    protected $hidden = ["_id"];
 }
 
