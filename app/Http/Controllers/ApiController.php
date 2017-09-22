@@ -216,15 +216,13 @@ class ApiController extends Controller
     protected function formatChannel2AI($channel)
     {
         return [
-            [
-                'type' => 'androidApp',
-                'name' => $channel->name,
-                'start_type' => 'activity',   //mainActivity,activity,action,broadcast,service
-                'package_name' => 'hdpfans.com',
-                'class_name' => 'hdp.player.StartActivity',
-                'extra' => [
-                    ['key' => "ChannelNum", 'value' => $channel->num]
-                ]
+            'type' => 'androidApp',
+            'name' => $channel->name,
+            'start_type' => 'activity',   //mainActivity,activity,action,broadcast,service
+            'package_name' => 'hdpfans.com',
+            'class_name' => 'hdp.player.StartActivity',
+            'extra' => [
+                ['key' => "ChannelNum", 'value' => $channel->num]
             ]
         ];
     }
@@ -303,7 +301,7 @@ class ApiController extends Controller
                     'tags' => $channelObj->tags,
                     'hot' => $channelObj->hot,
                     'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
-                    'liveProgram' =>  $showlive ? $this->getLiveProgramByChannelCode($channelObj->code) : null
+                    'liveProgram' => $showlive ? $this->getLiveProgramByChannelCode($channelObj->code) : null
                 ]);
             }
         }
@@ -484,13 +482,16 @@ class ApiController extends Controller
         }
         foreach ($albums as $key => $album) {
             $wiki = [
-                'model' => 'qqalbum',
                 'album_id' => $album->album_id,
                 'album_name' => $album->album_name,
                 'type' => $album->type,
                 'tags' => $album->sub_type,
                 'album_verpic' => $album->album_verpic,
                 'hot_num' => $album->hot_num,
+                'targetActions' => [
+                    'type' => 'innerApp',
+                    'start_type' => 'QQAlbumInfo'
+                ]
             ];
             $wikis[$key] = $wiki;
         }
@@ -540,19 +541,19 @@ class ApiController extends Controller
 
     public function GetQQAlbumInfo()
     {
-        if(!isset($this->param['album_id'])) {
+        if (!isset($this->param['album_id'])) {
             $this->setErrArray(1000, '错误的参数album_id');
             return false;
         }
         $album_id = $this->param['album_id'];
         $albumObj = QQAlbum::with('videos')->where('album_id', $album_id)->first();
         $data = [];
-        if(!$albumObj) {
+        if (!$albumObj) {
             $this->setErrArray(1000, '没有找到相关QQAlbum');
             return false;
         }
         $albumVideoObj = QQAlbumVideo::where('album_id', $album_id)
-                            ->orderBy('play_order', 'asc')->get();
+            ->orderBy('play_order', 'asc')->get();
 
         $this->backJson['data'] = $albumObj->toArray();
         return false;
