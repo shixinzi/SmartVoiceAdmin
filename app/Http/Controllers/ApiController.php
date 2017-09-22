@@ -216,9 +216,8 @@ class ApiController extends Controller
     protected function formatChannel2AI($channel)
     {
         return [
-            'type' => 'androidApp',
-            'name' => $channel->name,
-            'start_type' => 'activity',   //mainActivity,activity,action,broadcast,service
+            'active_type' => 'activity',
+            'name' => $channel->name,   //mainActivity,activity,action,broadcast,service,url
             'package_name' => 'hdpfans.com',
             'class_name' => 'hdp.player.StartActivity',
             'extra' => [
@@ -230,15 +229,12 @@ class ApiController extends Controller
     protected function formatQQAlbum2AI($album)
     {
         return [
-            [
-                'type' => 'androidApp',
-                'name' => $album->name,
-                'start_type' => 'action',   //activity,action,broadcast,service
-                'package_name' => 'com.ktcp.video',
-                'action_name' => 'com.tencent.qqlivetv.open',
-                'extra' => [
-                    ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $album->album_id . '&video_name=xxx&cover_id=xxx&cover_pulltype=1"']
-                ]
+            'active_type' => 'androidApp',  //mainActivity,activity,action,broadcast,service,url
+            'name' => $album->name,
+            'package_name' => 'com.ktcp.video',
+            'action_name' => 'com.tencent.qqlivetv.open',
+            'extra' => [
+                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $album->album_id . '&video_name=xxx&cover_id=xxx&cover_pulltype=1"']
             ]
         ];
     }
