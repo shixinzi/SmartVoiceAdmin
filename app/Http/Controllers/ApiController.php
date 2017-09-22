@@ -550,7 +550,7 @@ class ApiController extends Controller
         $videos = [];
         foreach ($albumVideoObjs as $albumVideoObj) {
             $video = $albumVideoObj->toArray();
-            $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj)
+            $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj);
         }
         $data['videos'] = $videos;
 
