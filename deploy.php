@@ -29,6 +29,8 @@ localhost()
 desc('git push origin master');
 task('git:push', function() {
     writeln('start git push task');
+    $result = run('pwd');
+    writeln("Current dir: $result");
     run('git add .');
     run('git commit -m "auto commit by deploy"');
     run('git push origin master');
@@ -43,9 +45,9 @@ task('php-fpm:restart', function () {
 
 
 
-after('deploy:symlink', 'php-fpm:restart');
+//after('deploy:symlink', 'php-fpm:restart');
 
 after('deploy:failed', 'deploy:unlock');
 
-before('deploy:symlink', 'artisan:migrate');
+//before('deploy:symlink', 'artisan:migrate');
 
