@@ -11,6 +11,7 @@ add('shared_files', []);
 add('shared_dirs', []);
 add('writable_dirs', []);
 set('allow_anonymous_stats', false);
+set('default_stage', 'local');
 
 // Hosts
 
@@ -19,6 +20,18 @@ host('120.27.239.106')
     ->user('chenshengwen')
     ->stage('prod')
     ->set('deploy_path', '/hwdata/www/SmartVoiceAdmin');
+
+localhost()
+    ->stage('local')
+    ->roles('test', 'build');
+
+
+desc('git push origin master');
+task('git:push', function() {
+    run('git add .');
+    run('git commit -m "auto commit by deploy"');
+    run('git push origin master');
+});
 
 // Tasks
 

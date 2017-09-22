@@ -191,13 +191,10 @@ class ApiController extends Controller
     protected function searchApp($text, $matches)
     {
         if (isset($matches[2]) || preg_match('/^我(要|想)打开(\S+)/', $text, $matches)) {
-            Log:
-            debug('searchApp' . $matches[2]);
             $key = $matches[2];
             $apps = App::where('name', $key)->get();
             return $this->formatApp2AI($apps);
         } else {
-            Log::debug('no matches');
             return null;
         }
     }
@@ -222,19 +219,6 @@ class ApiController extends Controller
             'class_name' => 'hdp.player.StartActivity',
             'extra' => [
                 ['key' => "ChannelNum", 'value' => $channel->num]
-            ]
-        ];
-    }
-
-    protected function formatQQAlbum2AI($album)
-    {
-        return [
-            'active_type' => 'androidApp',  //mainActivity,activity,action,broadcast,service,url
-            'name' => $album->name,
-            'package_name' => 'com.ktcp.video',
-            'action_name' => 'com.tencent.qqlivetv.open',
-            'extra' => [
-                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $album->album_id . '&video_name=xxx&cover_id=xxx&cover_pulltype=1"']
             ]
         ];
     }
@@ -481,10 +465,7 @@ class ApiController extends Controller
                 'tags' => $album->sub_type,
                 'album_verpic' => $album->album_verpic,
                 'hot_num' => $album->hot_num,
-                'targetActions' => [[
-                    'type' => 'innerApp',
-                    'start_type' => 'QQAlbumInfo'
-                ]]
+                'targetActions' => null,
             ];
             $wikis[$key] = $wiki;
         }
