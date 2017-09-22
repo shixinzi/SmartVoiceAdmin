@@ -243,15 +243,12 @@ class ApiController extends Controller
     {
 
         return [
-            [
-                'type' => 'androidApp',
-                'name' => $video->video_name,
-                'start_type' => 'action',   //activity,action,broadcast,service
-                'package_name' => 'com.ktcp.video',
-                'action_name' => 'com.tencent.qqlivetv.open',
-                'extra' => [
-                    ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=xxx&cover_pulltype=1"']
-                ]
+            'active_type' => 'action',
+            'name' => $video->video_name,
+            'package_name' => 'com.ktcp.video',
+            'action_name' => 'com.tencent.qqlivetv.open',
+            'extra' => [
+                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=xxx&cover_pulltype=1"']
             ]
         ];
     }
@@ -484,10 +481,10 @@ class ApiController extends Controller
                 'tags' => $album->sub_type,
                 'album_verpic' => $album->album_verpic,
                 'hot_num' => $album->hot_num,
-                'targetActions' => [
+                'targetActions' => [[
                     'type' => 'innerApp',
                     'start_type' => 'QQAlbumInfo'
-                ]
+                ]]
             ];
             $wikis[$key] = $wiki;
         }
@@ -542,16 +539,22 @@ class ApiController extends Controller
             return false;
         }
         $album_id = $this->param['album_id'];
-        $albumObj = QQAlbum::with('videos')->where('album_id', $album_id)->first();
-        $data = [];
+        $albumObj = QQAlbum::where('album_id', $album_id)->first();
         if (!$albumObj) {
             $this->setErrArray(1000, '没有找到相关QQAlbum');
             return false;
         }
-        $albumVideoObj = QQAlbumVideo::where('album_id', $album_id)
+        $data = $albumObj->toArray();
+        $albumVideoObjs = QQAlbumVideo::where('album_id', $album_id)
             ->orderBy('play_order', 'asc')->get();
+        $videos = [];
+        foreach ($albumVideoObjs as $albumVideoObj) {
+            $video = $albumVideoObj->toArray();
+            $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj)
+        }
+        $data['videos'] = $videos;
 
-        $this->backJson['data'] = $albumObj->toArray();
+        $this->backJson['data'] = $data;
         return false;
     }
 }
