@@ -28,6 +28,7 @@ localhost()
 
 desc('git push origin master');
 task('git:push', function() {
+    writeln('start git push task');
     run('git add .');
     run('git commit -m "auto commit by deploy"');
     run('git push origin master');
