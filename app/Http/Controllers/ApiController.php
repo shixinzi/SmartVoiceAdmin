@@ -522,6 +522,7 @@ class ApiController extends Controller
         foreach ($albumVideoObjs as $albumVideoObj) {
             $video = $albumVideoObj->toArray();
             $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj);
+            array_push($videos, $video);
         }
         $data['videos'] = $videos;
 
