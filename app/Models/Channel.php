@@ -49,4 +49,20 @@ class Channel extends Eloquent
             return Cache::get($key);
         }
     }
+
+    /**
+     *
+     *
+     * @param $query
+     * @param $gender
+     * @return mixed
+     */
+    public function scopeIsTop($query, $gender)
+    {
+        if (!in_array($gender, [1, 0])) {
+            return $query;
+        }
+
+        return $query->where('istop',  $gender);
+    }
 }

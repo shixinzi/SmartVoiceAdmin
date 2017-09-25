@@ -10,6 +10,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use App\Admin\Extensions\Tools\TopTool;
 
 class ChannelController extends Controller
 {
@@ -82,6 +83,10 @@ class ChannelController extends Controller
                 return implode(';', $tags);
             });
             $grid->column('hot', '热度');
+            $grid->column('istop', '推荐')->switch([
+                'on' => ['text' => 'Y'],
+                'off' => ['text' => 'N'],
+            ]);
             //$grid->created_at();
             $grid->updated_at('最后更新');
 
@@ -90,6 +95,12 @@ class ChannelController extends Controller
                 $filter->like('name', '名称');
                 $filter->equal('code', 'Code');
                 $filter->is('tags', '分类')->select(['cctv' => 'cctv', 'tv' => 'tv']);
+                //$filter->equal('istop', '推荐')->select([0 => 'No' ,1 => 'Yes']);
+            });
+
+            $grid->tools(function ($tools) {
+                //$tools->append(new RefreshTimer(5000));
+                //$tools->append(new TopTool());
             });
         });
     }
@@ -104,7 +115,7 @@ class ChannelController extends Controller
         return Admin::form(Channel::class, function (Form $form) {
 
             $form->display('id', 'ID');
-
+            $form->switch('istop','是否推荐');
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
         });

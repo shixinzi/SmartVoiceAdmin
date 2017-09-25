@@ -120,13 +120,13 @@ class ApiController extends Controller
             return false;
         }
         $text = $this->param['text'];
+        VoiceSearchLog::create(['voiceText' => $text, 'created_at' => time()]);
+
         $pregMatchs = [
             '/^我(要|想)看(\S+)/' => "searchTVAndVod",
             '/^我(要|想)打开(\S+)/' => "searchApp",
             '/^我(要|想)听(\S+)/' => "searchMusic",
         ];
-
-        VoiceSearchLog::create(['voiceText' => $text, 'created_at' => time()]);
 
         foreach ($pregMatchs as $pregMatch => $function) {
             if (preg_match($pregMatch, $text, $matches)) {
@@ -289,17 +289,7 @@ class ApiController extends Controller
 
     protected function GetChannelsByRecommended()
     {
-        $channelCodes = [
-            'dragontv',
-            'c39a7a374d888bce3912df71bcb0d580',
-            '590e187a8799b1890175d25ec85ea352',
-            '5dfcaefe6e7203df9fbe61ffd64ed1c4',
-            'antv',
-            'cctv1',
-            'cctv4_asia',
-            'cctv8'
-        ];
-        $channelObjs = Channel::whereIn('code', $channelCodes)->get();
+        $channelObjs = Channel::where('istop', 1)->orderBy("hot", 'desc')->get();
         $channels = [];
         $showlive = isset($this->param['showlive']) ? Tools::strToBoolean($this->param['showlive']) : null;
         foreach ($channelObjs as $key => $channelObj) {

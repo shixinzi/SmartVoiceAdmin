@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\QQalbum;
+use App\Models\QQAlbum;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
