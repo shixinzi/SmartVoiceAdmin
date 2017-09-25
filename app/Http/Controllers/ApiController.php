@@ -283,7 +283,7 @@ class ApiController extends Controller
             }
         }
         $this->backJson['total'] = count($channels);
-        $this->backJson['data'] = $channels;
+        $this->backJson['datas'] = $channels;
         return true;
     }
 
@@ -304,7 +304,7 @@ class ApiController extends Controller
             ]);
         }
         $this->backJson['total'] = count($channels);
-        $this->backJson['data'] = $channels;
+        $this->backJson['datas'] = $channels;
         return true;
     }
 
@@ -340,7 +340,7 @@ class ApiController extends Controller
         $this->backJson['pagesize'] = $pagesize;
         $this->backJson['total'] = $liveProgramCount;
         $this->backJson['pagetotal'] = intval(($liveProgramCount - 1) / $pagesize) + 1;
-        $this->backJson['data'] = $livePrograms;
+        $this->backJson['datas'] = $livePrograms;
         return true;
     }
 
@@ -385,7 +385,7 @@ class ApiController extends Controller
         $this->backJson['pagesize'] = 50;
         $this->backJson['total'] = count($programs);
         $this->backJson['pagetotal'] = 1;
-        $this->backJson['data'] = $programs;
+        $this->backJson['datas'] = $programs;
     }
 
     protected function GetHotWikiFollows()
@@ -409,7 +409,7 @@ class ApiController extends Controller
         $this->backJson['pagesize'] = $pagesize;
         $this->backJson['total'] = count($wikis);
         $this->backJson['pagetotal'] = 1;
-        $this->backJson['data'] = $wikis;
+        $this->backJson['datas'] = $wikis;
     }
 
     protected function GetHotWikiFormers()
@@ -433,7 +433,7 @@ class ApiController extends Controller
         $this->backJson['pagesize'] = $pagesize;
         $this->backJson['total'] = count($wikis);
         $this->backJson['pagetotal'] = 1;
-        $this->backJson['data'] = $wikis;
+        $this->backJson['datas'] = $wikis;
     }
 
     protected function GetHotVods()
@@ -463,7 +463,7 @@ class ApiController extends Controller
         $this->backJson['pagesize'] = $pagesize;
         $this->backJson['total'] = count($wikis);
         $this->backJson['pagetotal'] = 1;
-        $this->backJson['data'] = $wikis;
+        $this->backJson['datas'] = $wikis;
     }
 
     protected function getTargetActionObjsByChannelCode($channel_code)
@@ -519,13 +519,14 @@ class ApiController extends Controller
         $albumVideoObjs = QQAlbumVideo::where('album_id', $album_id)
             ->orderBy('play_order', 'asc')->get();
         $videos = [];
-        foreach ($albumVideoObjs as $albumVideoObj) {
-            $video = $albumVideoObj->toArray();
-            $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj);
-            array_push($videos, $video);
+        if($albumVideoObjs) {
+            foreach ($albumVideoObjs as $albumVideoObj) {
+                $video = $albumVideoObj->toArray();
+                $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj);
+                array_push($videos, $video);
+            }
         }
         $data['videos'] = $videos;
-
         $this->backJson['data'] = $data;
         return false;
     }
