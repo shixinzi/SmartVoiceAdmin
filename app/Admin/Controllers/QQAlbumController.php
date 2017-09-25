@@ -71,7 +71,7 @@ class QQAlbumController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(QQalbum::class, function (Grid $grid) {
+        return Admin::grid(QQAlbum::class, function (Grid $grid) {
             $grid->model()->orderBy('hot_num', 'desc');
             $grid->column('album_verpic', '封面')->display(function($album_verpic) {
                 return "<img src='$album_verpic' width='100px'>";
@@ -109,7 +109,7 @@ class QQAlbumController extends Controller
      */
     protected function form()
     {
-        return Admin::form(QQalbum::class, function (Form $form) {
+        return Admin::form(QQAlbum::class, function (Form $form) {
 
             $form->display('id', 'ID');
 
