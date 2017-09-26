@@ -20,3 +20,4 @@ Route::get('/test',  function() {
 });
 
 Route::post('api/v1', 'ApiController@v1Post');
+Route::post('itv/trigger', 'ItvController@trigger');
