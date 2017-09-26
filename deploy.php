@@ -45,7 +45,7 @@ task('php-fpm:restart', function () {
 
 
 
-//after('deploy:symlink', 'php-fpm:restart');
+after('deploy:symlink', 'php-fpm:restart');
 
 after('deploy:failed', 'deploy:unlock');
 

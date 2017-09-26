@@ -232,7 +232,7 @@ class ApiController extends Controller
             'package_name' => 'com.ktcp.video',
             'action_name' => 'com.tencent.qqlivetv.open',
             'extra' => [
-                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=' . $video->video_id . '&cover_pulltype=1"']
+                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=' . $video->album_id . '&cover_pulltype=1"']
             ]
         ];
     }
