@@ -223,6 +223,20 @@ class ApiController extends Controller
         ];
     }
 
+    protected function formatQQAlbum2AI($album)
+    {
+
+        return [
+            'active_type' => 'action',
+            'name' => $album->album_name,
+            'package_name' => 'com.ktcp.tvvideo',
+            'action_name' => 'om.tencent.qqlivetv.open',
+            'extra' => [
+                ['uri' => 'tenvideo2://?action=1&cover_id='.$album->album_id.'&pull_from=101503']
+            ]
+        ];
+    }
+
     protected function formatQQAlbumVideo2AI($video)
     {
 
@@ -455,7 +469,7 @@ class ApiController extends Controller
                 'tags' => $album->sub_type,
                 'album_verpic' => $album->album_verpic,
                 'hot_num' => $album->hot_num,
-                'targetActions' => null,
+                'targetActions' => [$this->formatQQAlbum2AI($album)],
             ];
             $wikis[$key] = $wiki;
         }
