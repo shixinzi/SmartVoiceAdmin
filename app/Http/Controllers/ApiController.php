@@ -17,6 +17,7 @@ use App\Models\VoiceSearchLog;
 use App\Models\VoiceLocalCommand;
 use Log;
 use Cache;
+use XS;
 use App\Common\Tools;
 
 class ApiController extends Controller
@@ -130,7 +131,7 @@ class ApiController extends Controller
 
         foreach ($pregMatchs as $pregMatch => $function) {
             if (preg_match($pregMatch, $text, $matches)) {
-                $this->backJson['data'] = $this->$function($text, $matches);
+                $this->$function($text, $matches);
                 return false;
             }
         }
@@ -168,22 +169,35 @@ class ApiController extends Controller
                 $num = Tools::cnNum2Num(trim($matches2[2]));
             } else {
                 Log::info("-------------");
-                $num = '1';
+                $num = null;
             }
-            $qqAlbum = QQAlbum::where("album_name", $key)->first();
-            if (!$qqAlbum) {
+            $key = str_replace(['的'] ,'', $key);
+            $xs = new \XS(config_path('./album.ini'));
+            $docs = $xs->search->setSort('score')->setLimit(10)->search($key);
+            $count = $xs->search->lastCount;
+            if($count) {
                 $this->setErrArray(1002, '没有找到你想要的结果!');
                 return false;
             }
-            $qqAlbumVideo = QQAlbumVideo::where("album_id", $qqAlbum->album_id)
-                ->where('play_order', $num)->first();
-            if (!$qqAlbumVideo) {
-                $this->setErrArray(1002, '没有找到你想要的结果!');
-                return false;
+            if(!$num) {
+                $datas = [];
+                foreach ($docs as $doc) {
+                    array_push($datas, $this->formatXsAlbum2AI($doc));
+                }
+                $this->backJson['datas'] = $datas;
             } else {
-                return $this->formatQQAlbumVideo2AI($qqAlbumVideo);
+                $qqAlbumVideo = QQAlbumVideo::where("album_id", $qqAlbum->album_id)
+                    ->where('play_order', $num)->first();
+                if (!$qqAlbumVideo) {
+                    $this->setErrArray(1002, '没有找到你想要的结果!');
+                    return false;
+                } else {
+                    $this->backJson['data'] = $this->formatQQAlbumVideo2AI($qqAlbumVideo);
+                }
             }
+
         } else {
+            $this->setErrArray(1002, '没有找到你想要的结果!');
             return false;
         }
     }
@@ -219,6 +233,22 @@ class ApiController extends Controller
             'class_name' => 'hdp.player.StartActivity',
             'extra' => [
                 ['key' => "ChannelNum", 'value' => $channel->num]
+            ]
+        ];
+    }
+
+    protected function formatXsAlbum2AI($doc)
+    {
+
+        return [
+            'active_type' => 'action',
+            'name' => $doc->albumName,
+            'verpic' => $doc->albumVerpic,
+            'horpic' => $doc->albumHorpic,
+            'package_name' => 'com.ktcp.tvvideo',
+            'action_name' => 'om.tencent.qqlivetv.open',
+            'extra' => [
+                ['uri' => 'tenvideo2://?action=1&cover_id='.$doc->album_id.'&pull_from=101503']
             ]
         ];
     }

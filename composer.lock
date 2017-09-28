@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2c8214f7165586b27d6749cc706c89b",
+    "content-hash": "9e23335c361d7a62294915733b44af33",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -112,12 +112,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/z-song/laravel-admin.git",
-                "reference": "a7d144b26ee3ffa67831fc7bc8d5e08871954ecc"
+                "reference": "655ca9c7131975c3ae22bced4cbc44b5fe1fec01"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/z-song/laravel-admin/a7d144b26ee3ffa67831fc7bc8d5e08871954ecc.zip",
-                "reference": "a7d144b26ee3ffa67831fc7bc8d5e08871954ecc",
+                "url": "https://files.phpcomposer.com/files/z-song/laravel-admin/655ca9c7131975c3ae22bced4cbc44b5fe1fec01.zip",
+                "reference": "655ca9c7131975c3ae22bced4cbc44b5fe1fec01",
                 "shasum": ""
             },
             "require": {
@@ -165,7 +165,7 @@
                 "grid",
                 "laravel"
             ],
-            "time": "2017-09-12 01:52:30"
+            "time": "2017-09-25 09:40:13"
         },
         {
             "name": "erusev/parsedown",
@@ -391,6 +391,64 @@
             "time": "2017-03-20T17:10:46+00:00"
         },
         {
+            "name": "hightman/xunsearch",
+            "version": "1.4.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hightman/xs-sdk-php.git",
+                "reference": "20ecf25fd4281b8490594557d039ad1a5b3b16f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/hightman/xs-sdk-php/20ecf25fd4281b8490594557d039ad1a5b3b16f6.zip",
+                "reference": "20ecf25fd4281b8490594557d039ad1a5b3b16f6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "lib-pcre": "*",
+                "php": ">=5.3.0"
+            },
+            "bin": [
+                "util/xs"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "lib/",
+                    "wrapper/yii-ext/"
+                ],
+                "psr-4": {
+                    "hightman\\xunsearch\\": "wrapper/yii2-ext/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "hightman",
+                    "email": "hightman@twomice.net",
+                    "role": "Founder and project leader"
+                }
+            ],
+            "description": "xunsearch php sdk, include yii, yii2 supports",
+            "homepage": "http://www.xunsearch.com/",
+            "keywords": [
+                "search engine",
+                "xunsearch",
+                "yii",
+                "yii2"
+            ],
+            "time": "2016-03-23T15:34:06+00:00"
+        },
+        {
             "name": "ircmaxell/password-compat",
             "version": "v1.0.4",
             "source": {
@@ -521,16 +579,16 @@
         },
         {
             "name": "jenssegers/mongodb",
-            "version": "v3.2.2",
+            "version": "v3.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/laravel-mongodb.git",
-                "reference": "1358e50428bc0aeea6d3e13717104d6d9b313887"
+                "reference": "c0cae3e187999ea80f92cc5ab169de4baa784f2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/jenssegers/laravel-mongodb/1358e50428bc0aeea6d3e13717104d6d9b313887.zip",
-                "reference": "1358e50428bc0aeea6d3e13717104d6d9b313887",
+                "url": "https://files.phpcomposer.com/files/jenssegers/laravel-mongodb/c0cae3e187999ea80f92cc5ab169de4baa784f2e.zip",
+                "reference": "c0cae3e187999ea80f92cc5ab169de4baa784f2e",
                 "shasum": ""
             },
             "require": {
@@ -551,10 +609,17 @@
                 "jenssegers/mongodb-session": "Add MongoDB session support to Laravel-MongoDB"
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Jenssegers\\Mongodb\\MongodbServiceProvider",
+                        "Jenssegers\\Mongodb\\MongodbQueueServiceProvider"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-0": {
-                    "Jenssegers\\Mongodb": "src/",
-                    "Jenssegers\\Eloquent": "src/"
+                    "Jenssegers\\Mongodb": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -578,7 +643,7 @@
                 "mongo",
                 "mongodb"
             ],
-            "time": "2017-03-12T09:23:10+00:00"
+            "time": "2017-09-05T11:17:05+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1186,16 +1251,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.10",
+            "version": "v2.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d"
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/paragonie/random_compat/634bae8e911eefa89c1abfbf1b66da679ac8f54d.zip",
-                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d",
+                "url": "https://files.phpcomposer.com/files/paragonie/random_compat/5da4d3c796c275c55f057af5a643ae297d96b4d8.zip",
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8",
                 "shasum": ""
             },
             "require": {
@@ -1230,7 +1295,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2017-03-13T16:27:32+00:00"
+            "time": "2017-09-27T21:40:39+00:00"
         },
         {
             "name": "predis/predis",
@@ -1554,16 +1619,16 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.7.0",
+            "version": "3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "0ef23d1b10cf1bc576e9d865a7e9c47982c5715e"
+                "reference": "45cffe822057a09e05f7bd09ec5fb88eeecd2334"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/ramsey/uuid/0ef23d1b10cf1bc576e9d865a7e9c47982c5715e.zip",
-                "reference": "0ef23d1b10cf1bc576e9d865a7e9c47982c5715e",
+                "url": "https://files.phpcomposer.com/files/ramsey/uuid/45cffe822057a09e05f7bd09ec5fb88eeecd2334.zip",
+                "reference": "45cffe822057a09e05f7bd09ec5fb88eeecd2334",
                 "shasum": ""
             },
             "require": {
@@ -1632,7 +1697,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2017-08-04T13:39:04+00:00"
+            "time": "2017-09-22T20:46:04+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -2699,16 +2764,16 @@
         },
         {
             "name": "voku/portable-utf8",
-            "version": "3.1.25",
+            "version": "3.1.26",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/portable-utf8.git",
-                "reference": "607d481a647f81b685e32d0313c0c700699dc321"
+                "reference": "89c05dc7ccd1e482f1f5fa7074c5114f76d8fc60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/voku/portable-utf8/607d481a647f81b685e32d0313c0c700699dc321.zip",
-                "reference": "607d481a647f81b685e32d0313c0c700699dc321",
+                "url": "https://files.phpcomposer.com/files/voku/portable-utf8/89c05dc7ccd1e482f1f5fa7074c5114f76d8fc60.zip",
+                "reference": "89c05dc7ccd1e482f1f5fa7074c5114f76d8fc60",
                 "shasum": ""
             },
             "require": {
@@ -2765,7 +2830,7 @@
                 "utf-8",
                 "utf8"
             ],
-            "time": "2017-08-05T00:21:32+00:00"
+            "time": "2017-09-24T18:27:57+00:00"
         },
         {
             "name": "voku/simple_html_dom",
@@ -3539,16 +3604,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "5.7.21",
+            "version": "5.7.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3b91adfb64264ddec5a2dee9851f354aa66327db"
+                "reference": "10df877596c9906d4110b5b905313829043f2ada"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/sebastianbergmann/phpunit/3b91adfb64264ddec5a2dee9851f354aa66327db.zip",
-                "reference": "3b91adfb64264ddec5a2dee9851f354aa66327db",
+                "url": "https://files.phpcomposer.com/files/sebastianbergmann/phpunit/10df877596c9906d4110b5b905313829043f2ada.zip",
+                "reference": "10df877596c9906d4110b5b905313829043f2ada",
                 "shasum": ""
             },
             "require": {
@@ -3617,7 +3682,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-06-21T08:11:54+00:00"
+            "time": "2017-09-24T07:23:38+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

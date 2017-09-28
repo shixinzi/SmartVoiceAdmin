@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
         Commands\CronUpdateWikiExtendInfo::class,
         Commands\CronMatchWikiAndQQAlbum::class,
         Commands\CronUpdateQQAlbumHotFromQQ::class,
+        Commands\CronMakeXunsearch::class,
     ];
 
     /**
