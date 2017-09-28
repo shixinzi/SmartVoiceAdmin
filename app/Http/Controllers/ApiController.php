@@ -176,7 +176,7 @@ class ApiController extends Controller
             $xs = new \XS(config_path('./album.ini'));
             $docs = $xs->search->setSort('score')->setLimit(10)->search($key);
             $count = $xs->search->lastCount;
-            if($count) {
+            if(!$count) {
                 $this->setErrArray(1002, '没有找到你想要的结果!');
                 return false;
             }
