@@ -59,7 +59,7 @@ class CronMakeXunsearch extends Command
         $xs->index->clean();
         QQAlbum::chunk(2000, function($albums) use($xs) {
             foreach($albums as $i => $album) {
-                $this->info($i ."\t". $album->album_name);
+                $this->debug($i ."\t". $album->album_name);
                 $doc = new \XSDocument;
                 $data = [
                     'album_id' => $album->album_id,
