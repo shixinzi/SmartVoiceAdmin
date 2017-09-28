@@ -275,6 +275,8 @@ class ApiController extends Controller
         return [
             'active_type' => 'action',
             'name' => $video->video_name,
+            'verpic' => $video->video_verpic,
+            'horpic' => $video->video_horpic,
             'package_name' => 'com.ktcp.video',
             'action_name' => 'com.tencent.qqlivetv.open',
             'extra' => [
