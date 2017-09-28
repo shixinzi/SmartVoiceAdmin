@@ -38,8 +38,8 @@ class CronMakeXunsearch extends Command
      */
     public function handle()
     {
-        $this->testSearch();
-        //$this->makeAlbum();
+        //$this->testSearch();
+        $this->makeAlbum();
     }
 
     public function testSearch()
