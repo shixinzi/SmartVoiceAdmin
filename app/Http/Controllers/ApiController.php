@@ -172,6 +172,7 @@ class ApiController extends Controller
                 $num = null;
             }
             $key = str_replace(['的'] ,'', $key);
+            Log::info($key);
             $xs = new \XS(config_path('./album.ini'));
             $docs = $xs->search->setSort('score')->setLimit(10)->search($key);
             $count = $xs->search->lastCount;
@@ -186,7 +187,8 @@ class ApiController extends Controller
                 }
                 $this->backJson['datas'] = $datas;
             } else {
-                $qqAlbumVideo = QQAlbumVideo::where("album_id", $qqAlbum->album_id)
+                $doc = $docs[0];
+                $qqAlbumVideo = QQAlbumVideo::where("album_id", $doc->album_id)
                     ->where('play_order', $num)->first();
                 if (!$qqAlbumVideo) {
                     $this->setErrArray(1002, '没有找到你想要的结果!');

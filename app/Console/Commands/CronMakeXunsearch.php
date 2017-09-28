@@ -45,7 +45,7 @@ class CronMakeXunsearch extends Command
     public function testSearch()
     {
         $xs = new \XS(config_path('./album.ini'));
-        $docs = $xs->search->setSort('score')->setLimit(10)->search('天才九宫格');
+        $docs = $xs->search->setSort('score')->setLimit(10)->search('青云志');
         $count = $xs->search->lastCount;
         foreach($docs as $doc) {
             $this->info($count ."|". $doc->albumName ."(". trim($doc->tags) .")". $doc->percent());
