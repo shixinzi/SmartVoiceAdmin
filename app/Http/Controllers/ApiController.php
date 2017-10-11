@@ -372,13 +372,13 @@ class ApiController extends Controller
         $liveProgramObjs = LiveProgram::orderBy('hot', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($liveProgramObjs as $key => $liveProgramObj) {
             $livePrograms[$key] = [
-                'program_name' => $liveProgramObj->program_name,
-                'channel_code' => $liveProgramObj->channel_code,
-                'start_time' => date('Y-m-d H:i:s', $liveProgramObj->start_time),
-                'end_time' => date('Y-m-d H:i:s', $liveProgramObj->end_time),
-                'wiki_id' => $liveProgramObj->wiki_id,
-                "wiki_title" => $liveProgramObj->wiki_title,
-                "wiki_cover" => $this->getWikiCover($liveProgramObj->wiki_cover),
+                'programName' => $liveProgramObj->program_name,
+                'channelCode' => $liveProgramObj->channel_code,
+                'startTime' => date('Y-m-d H:i:s', $liveProgramObj->start_time),
+                'endTime' => date('Y-m-d H:i:s', $liveProgramObj->end_time),
+                'wikiID' => $liveProgramObj->wiki_id,
+                "wikiTitle" => $liveProgramObj->wiki_title,
+                "wikiCover" => $this->getWikiCover($liveProgramObj->wiki_cover),
                 'tags' => $liveProgramObj->tags,
                 'hot' => $liveProgramObj->hot,
                 'targetActions' => $this->getTargetActionObjsByChannelCode($liveProgramObj->channel_code),
@@ -416,16 +416,16 @@ class ApiController extends Controller
         $programObjs = Program::where('channel_code', $channel_code)->where('date', $date)->get();
         foreach ($programObjs as $key => $programObj) {
             $program = [
-                'program_name' => $programObj->name,
-                'channel_code' => $programObj->channel_code,
-                'start_time' => date('Y-m-d H:i:s', $programObj->start_time),
-                'end_time' => date('Y-m-d H:i:s', $programObj->end_time),
+                'programName' => $programObj->name,
+                'channelCode' => $programObj->channel_code,
+                'startTime' => date('Y-m-d H:i:s', $programObj->start_time),
+                'endTime' => date('Y-m-d H:i:s', $programObj->end_time),
                 'tags' => $programObj->tags,
             ];
             if ($programObj->wiki_id && ($wikiObj = Wiki::getOneById($programObj->wiki_id))) {
-                $program["wiki_id"] = $programObj->wiki_id;
-                $program["wiki_title"] = $wikiObj->title;
-                $program["wiki_cover"] = $this->getWikiCover($wikiObj->cover);
+                $program["wikiID"] = $programObj->wiki_id;
+                $program["wikiTitle"] = $wikiObj->title;
+                $program["wikiCover"] = $this->getWikiCover($wikiObj->cover);
             }
             $programs[$key] = $program;
         }
@@ -444,11 +444,11 @@ class ApiController extends Controller
         $wikiFollows = WikiFollow::orderBy('rating', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($wikiFollows as $key => $wikiFollow) {
             $wiki = [
-                'wiki_id' => $wikiFollow->wiki_id,
-                'wiki_title' => $wikiFollow->wiki_title,
-                'wiki_model' => $wikiFollow->wiki_model,
-                'wiki_tags' => $wikiFollow->tags,
-                'wiki_cover' => $this->getWikiCover($wikiFollow->wiki_cover),
+                'wikiID' => $wikiFollow->wiki_id,
+                'wikiTitle' => $wikiFollow->wiki_title,
+                'wikiModel' => $wikiFollow->wiki_model,
+                'wikiTags' => $wikiFollow->tags,
+                'wikiCover' => $this->getWikiCover($wikiFollow->wiki_cover),
                 'rating' => $wikiFollow->rating,
             ];
             $wikis[$key] = $wiki;
@@ -468,11 +468,11 @@ class ApiController extends Controller
         $wikiFormers = WikiFormer::orderBy('rating', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($wikiFormers as $key => $wikiFormer) {
             $wiki = [
-                'wiki_id' => $wikiFormer->wiki_id,
-                'wiki_title' => $wikiFormer->wiki_title,
-                'wiki_model' => $wikiFormer->wiki_model,
-                'wiki_tags' => $wikiFormer->tags,
-                'wiki_cover' => $this->getWikiCover($wikiFormer->wiki_cover),
+                'wikiID' => $wikiFormer->wiki_id,
+                'wikiTitle' => $wikiFormer->wiki_title,
+                'wikiModel' => $wikiFormer->wiki_model,
+                'wikiTags' => $wikiFormer->tags,
+                'wikiCover' => $this->getWikiCover($wikiFormer->wiki_cover),
                 'rating' => $wikiFormer->rating,
             ];
             $wikis[$key] = $wiki;
