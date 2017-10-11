@@ -40,31 +40,23 @@ class TestEcho extends Command
      */
     public function handle()
     {
-        $ids = [];
-        $txts = file_get_contents('./wids3.txt');
-        $lines = explode("\n", $txts);
-        foreach($lines as $line) {
-            $line = trim($line);
-            $wiki = \App\Models\Wiki::find($line);
-            if($wiki) {
-                $this->info($wiki->title);
-                file_put_contents("./wikis/" . $wiki->_id . ".json", $wiki->toJson());
-            }
-        }
-        exit;
-
-        $this->info('Hello word!');
-        \App\Models\Program::distinct('wiki_id')->chunk(10000, function($wikis) {
-            $ids = [];
-            foreach($wikis as $wiki) {
-                if($wiki->wiki_id) {
-                    array_push($ids, $wiki->wiki_id);
+        \Excel::create('channels', function($excel) {
+            $excel->sheet('Sheetname', function($sheet) {
+                $channelObjs = \App\Models\Channel::orderBy('sort_id', 'asc')->get();
+                $channels = [];
+                foreach($channelObjs as $key => $channelObj) {
+                    $cols = ['tv_station_id', 'sort_id', 'name', 'code', 'memo', 'type', 'logo', 'lookcheck'];
+                    $channel = [];
+                    foreach($cols as $col) {
+                        $channel[$col] = $channelObj->$col ? $channelObj->$col : "";
+                    }
+                    $channels[$key] = $channel;
                 }
-            }
-            $this->info($this->index++);
-            file_put_contents("./wids.txt", implode("\n", $ids), FILE_APPEND);
-        });
-        exit;
+                $sheet->fromArray($channels);
+
+            });
+
+        })->store('xls', storage_path('exports'));
     }
 
     public function initVoiceLocalCommands()

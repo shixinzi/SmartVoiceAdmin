@@ -10,6 +10,7 @@ class Channel extends Eloquent
     protected $connection = 'mongodb';
     protected $collection = 'channel';
     protected $fillable = ['name' ,'code', 'tags', 'logo', 'code_sd', 'memos' , 'sort'];
+    protected $hidden = ['autosyn', 'editor_update', 'created_at', 'updated_at'];
     protected $casts = [
         'sort' => 'integer',
     ];
