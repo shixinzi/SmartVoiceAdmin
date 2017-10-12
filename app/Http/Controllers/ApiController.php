@@ -120,7 +120,7 @@ class ApiController extends Controller
             $this->setErrArray(1011, '不完善的参数text');
             return false;
         }
-        $text = $this->param['text'];
+        $text = Tools::filterSearchText($this->param['text']);
         VoiceSearchLog::create(['voiceText' => $text, 'created_at' => time()]);
 
         $pregMatchs = [

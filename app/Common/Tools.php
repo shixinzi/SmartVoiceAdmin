@@ -4,6 +4,12 @@ namespace app\Common;
 
 class Tools
 {
+    static public function filterSearchText($text)
+    {
+        $text = str_replace(['。'], '', $text);
+        return $text;
+    }
+
     static public function strToBoolean($str)
     {
         return isset($str) && in_array($str, ['yes', 'true']);
