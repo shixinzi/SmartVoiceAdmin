@@ -159,7 +159,7 @@ class ApiController extends Controller
     {
         if (preg_match('/^我(要|想)看(\S+)/', $text, $matches) && isset($matches[2])) {
             $key = trim($matches[2]);
-            $channelObjs = HdpChannel::where("name", $key)->get();
+            $channelObjs = Channel::where("name", $key)->get();
             if ($channelObjs) {
                 $channels = [];
                 foreach ($channelObjs as $key => $channelObj) {
