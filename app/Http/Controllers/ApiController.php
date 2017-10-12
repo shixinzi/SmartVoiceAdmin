@@ -159,11 +159,11 @@ class ApiController extends Controller
     {
         if (preg_match('/^我(要|想)看(\S+)/', $text, $matches) && isset($matches[2])) {
             $key = trim($matches[2]);
-            $channelObjs = Channel::where("name", $key)->get();
-            if ($channelObjs) {
+            $channelObjs = Channel::where("name", $key)->limit(10)->get();
+            if ($channelObjs && count($channelObjs) > 0) {
                 $channels = [];
                 foreach ($channelObjs as $key => $channelObj) {
-                    array_push($channels, [
+                    $channels[$key] = [
                         'model' => 'channel',
                         'name' => $channelObj->name,
                         'code' => $channelObj->code,
@@ -172,13 +172,13 @@ class ApiController extends Controller
                         'hot' => $channelObj->hot,
                         'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
                         'liveProgram' => $this->getLiveProgramByChannelCode($channelObj->code)
-                    ]);
+                    ];
                 }
                 $this->backJson['data'] = $channels;
                 return true;
             }
-            $liveProgramObjs = LiveProgram::where("program_name", $key)->orWhere('wiki_title', $key)->get();
-            if($liveProgramObjs) {
+            $liveProgramObjs = LiveProgram::where("program_name", $key)->orWhere('wiki_title', $key)->limit(10)->get();
+            if ($liveProgramObjs && count($liveProgramObjs) > 0) {
                 \Log::info('search liveProgram');
                 $livePrograms = [];
                 foreach ($liveProgramObjs as $key => $liveProgramObj) {
@@ -208,20 +208,21 @@ class ApiController extends Controller
                 Log::info("-------------");
                 $num = null;
             }
-            $key = str_replace(['的'] ,'', $key);
+            $key = str_replace(['的'], '', $key);
             $xs = new \XS(config_path('./album.ini'));
             $docs = $xs->search->setSort('score')->setLimit(10)->search($key);
             $count = $xs->search->lastCount;
-            if(!$count) {
+            if (!$count) {
                 $this->setErrArray(1002, '没有找到你想要的结果!');
                 return false;
             }
-            if(!$num) {
+            if (!$num) {
                 $datas = [];
-                foreach ($docs as $doc) {
-                    array_push($datas, $this->formatXsAlbum2AI($doc));
+                foreach ($docs as $key => $doc) {
+                    $datas[$key] = $this->formatXsAlbum2AI($doc);
                 }
                 $this->backJson['datas'] = $datas;
+                return true;
             } else {
                 $doc = $docs[0];
                 $qqAlbumVideo = QQAlbumVideo::where("album_id", $doc->album_id)
@@ -230,7 +231,10 @@ class ApiController extends Controller
                     $this->setErrArray(1002, '没有找到你想要的结果!');
                     return false;
                 } else {
-                    $this->backJson['data'] = $this->formatQQAlbumVideo2AI($qqAlbumVideo);
+                    $data = [];
+                    $data[0] = $this->formatQQAlbumVideo2AI($qqAlbumVideo);
+                    $this->backJson['data'] = $data;
+                    return true;
                 }
             }
 
@@ -245,12 +249,12 @@ class ApiController extends Controller
         if (isset($matches[2]) || preg_match('/^我(要|想)打开(\S+)/', $text, $matches)) {
             $key = $matches[2];
             $apps = App::where('name', $key)->get();
-            if(!$apps) {
+            if (!$apps) {
                 $this->setErrArray(1002, '没有找到你想要的结果!');
                 return false;
             }
             $data = [];
-            foreach($apps as $key => $app) {
+            foreach ($apps as $key => $app) {
                 $data[$key][0] = $this->formatApp2AI($app);
             }
             $this->backJson['data'] = $data;
@@ -289,15 +293,19 @@ class ApiController extends Controller
     protected function formatXsAlbum2AI($doc)
     {
         return [
-            'active_model' => 'album',
-            'active_type' => 'action',
+            'model' => 'album',
             'name' => $doc->albumName,
             'verpic' => $doc->albumVerpic,
             'horpic' => $doc->albumHorpic,
-            'package_name' => 'com.ktcp.tvvideo',
-            'action_name' => 'om.tencent.qqlivetv.open',
-            'extra' => [
-                ['uri' => 'tenvideo2://?action=1&cover_id='.$doc->album_id.'&pull_from=101503']
+            'targetActions' => [
+                [
+                    'active_type' => 'action',
+                    'package_name' => 'com.ktcp.tvvideo',
+                    'action_name' => 'om.tencent.qqlivetv.open',
+                    'extra' => [
+                        ['uri' => 'tenvideo2://?action=1&cover_id=' . $doc->album_id . '&pull_from=101503']
+                    ]
+                ]
             ]
         ];
     }
@@ -307,28 +315,38 @@ class ApiController extends Controller
 
         return [
             'active_model' => 'album',
-            'active_type' => 'action',
             'name' => $album->album_name,
-            'package_name' => 'com.ktcp.tvvideo',
-            'action_name' => 'om.tencent.qqlivetv.open',
-            'extra' => [
-                ['uri' => 'tenvideo2://?action=1&cover_id='.$album->album_id.'&pull_from=101503']
-            ]
+            'targetActions' => [
+                [
+                    'active_type' => 'action',
+                    'package_name' => 'com.ktcp.tvvideo',
+                    'action_name' => 'om.tencent.qqlivetv.open',
+                    'extra' => [
+                        ['uri' => 'tenvideo2://?action=1&cover_id=' . $album->album_id . '&pull_from=101503']
+                    ]
+                ]
+            ],
         ];
     }
 
     protected function formatQQAlbumVideo2AI($video)
     {
         return [
-            'active_model' => 'albumVideo',
-            'active_type' => 'action',
+            'model' => 'albumVideo',
             'name' => $video->video_name,
+            'album_id' => $video->album_id,
+            'video_id' => $video->video_id,
             'verpic' => $video->video_verpic,
             'horpic' => $video->video_horpic,
-            'package_name' => 'com.ktcp.video',
-            'action_name' => 'com.tencent.qqlivetv.open',
-            'extra' => [
-                ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=' . $video->album_id . '&cover_pulltype=1"']
+            'targetActions' => [
+                [
+                    'active_type' => 'action',
+                    'package_name' => 'com.ktcp.video',
+                    'action_name' => 'com.tencent.qqlivetv.open',
+                    'extra' => [
+                        ['uri' => 'uri="tenvideo2://?action=7&video_id=' . $video->video_id . '&video_name=' . $video->video_name . '&cover_id=' . $video->album_id . '&cover_pulltype=1"']
+                    ]
+                ]
             ]
         ];
     }
@@ -364,6 +382,7 @@ class ApiController extends Controller
         if ($channelObjs) {
             foreach ($channelObjs as $key => $channelObj) {
                 array_push($channels, [
+                    'model' => 'channel',
                     'name' => $channelObj->name,
                     'code' => $channelObj->code,
                     'logo' => $this->getChannelLogo($channelObj->logo),
@@ -386,6 +405,7 @@ class ApiController extends Controller
         $showlive = isset($this->param['showlive']) ? Tools::strToBoolean($this->param['showlive']) : null;
         foreach ($channelObjs as $key => $channelObj) {
             array_push($channels, [
+                'model' => 'channel',
                 'name' => $channelObj->name,
                 'code' => $channelObj->code,
                 'logo' => $this->getChannelLogo($channelObj->logo),
@@ -416,6 +436,7 @@ class ApiController extends Controller
         $liveProgramObjs = LiveProgram::orderBy('hot', 'desc')->skip($skip)->take($pagesize)->get();
         foreach ($liveProgramObjs as $key => $liveProgramObj) {
             $livePrograms[$key] = [
+                'model' => 'live',
                 'programName' => $liveProgramObj->program_name,
                 'channelCode' => $liveProgramObj->channel_code,
                 'startTime' => date('Y-m-d H:i:s', $liveProgramObj->start_time),
@@ -541,6 +562,7 @@ class ApiController extends Controller
         }
         foreach ($albums as $key => $album) {
             $wiki = [
+                'model' => 'album',
                 'album_id' => $album->album_id,
                 'album_name' => $album->album_name,
                 'type' => $album->type,
@@ -611,7 +633,7 @@ class ApiController extends Controller
         $albumVideoObjs = QQAlbumVideo::where('album_id', $album_id)
             ->orderBy('play_order', 'asc')->get();
         $videos = [];
-        if($albumVideoObjs) {
+        if ($albumVideoObjs) {
             foreach ($albumVideoObjs as $albumVideoObj) {
                 $video = $albumVideoObj->toArray();
                 $video['targetActions'][0] = $this->formatQQAlbumVideo2AI($albumVideoObj);
