@@ -161,7 +161,8 @@ class ApiController extends Controller
             $key = trim($matches[2]);
             $channel = HdpChannel::where("name", $key)->first();
             if ($channel) {
-                return $this->formatChannel2AI($channel);
+                $this->backJson['data'] = $this->formatChannel2AI($channel);
+                return true;
             }
             if (preg_match('/^(\S+)第(\S+)(集|期)/', $key, $matches2)) {
                 Log::info($matches2[1] . "\t" . $matches2[2]);
