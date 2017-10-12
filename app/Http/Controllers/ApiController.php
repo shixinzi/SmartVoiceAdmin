@@ -179,6 +179,7 @@ class ApiController extends Controller
             }
             $liveProgramObjs = LiveProgram::where("program_name", $key)->orWhere('wiki_title', $key)->get();
             if($liveProgramObjs) {
+                \Log::info('search liveProgram');
                 $livePrograms = [];
                 foreach ($liveProgramObjs as $key => $liveProgramObj) {
                     $livePrograms[$key] = [
@@ -200,7 +201,7 @@ class ApiController extends Controller
             }
 
             if (preg_match('/^(\S+)第(\S+)(集|期)/', $key, $matches2)) {
-                //Log::info($matches2[1] . "\t" . $matches2[2]);
+                Log::info($matches2[1] . "\t" . $matches2[2]);
                 $key = trim($matches2[1]);
                 $num = Tools::cnNum2Num(trim($matches2[2]));
             } else {
