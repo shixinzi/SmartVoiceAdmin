@@ -174,7 +174,7 @@ class ApiController extends Controller
                         'liveProgram' => $this->getLiveProgramByChannelCode($channelObj->code)
                     ];
                 }
-                $this->backJson['data'] = $channels;
+                $this->backJson['datas'] = $channels;
                 return true;
             }
             $liveProgramObjs = LiveProgram::where("program_name", $key)->orWhere('wiki_title', $key)->limit(10)->get();
@@ -196,7 +196,7 @@ class ApiController extends Controller
                         'targetActions' => $this->getTargetActionObjsByChannelCode($liveProgramObj->channel_code),
                     ];
                 }
-                $this->backJson['data'] = $livePrograms;
+                $this->backJson['datas'] = $livePrograms;
                 return true;
             }
 
@@ -233,7 +233,7 @@ class ApiController extends Controller
                 } else {
                     $data = [];
                     $data[0] = $this->formatQQAlbumVideo2AI($qqAlbumVideo);
-                    $this->backJson['data'] = $data;
+                    $this->backJson['datas'] = $data;
                     return true;
                 }
             }
@@ -257,7 +257,7 @@ class ApiController extends Controller
             foreach ($apps as $key => $app) {
                 $data[$key][0] = $this->formatApp2AI($app);
             }
-            $this->backJson['data'] = $data;
+            $this->backJson['datas'] = $data;
             return true;
         } else {
             $this->setErrArray(1002, '没有找到你想要的结果!');
@@ -314,18 +314,12 @@ class ApiController extends Controller
     {
 
         return [
-            'active_model' => 'album',
-            'name' => $album->album_name,
-            'targetActions' => [
-                [
-                    'active_type' => 'action',
-                    'package_name' => 'com.ktcp.tvvideo',
-                    'action_name' => 'om.tencent.qqlivetv.open',
-                    'extra' => [
-                        ['uri' => 'tenvideo2://?action=1&cover_id=' . $album->album_id . '&pull_from=101503']
-                    ]
-                ]
-            ],
+            'active_type' => 'action',
+            'package_name' => 'com.ktcp.tvvideo',
+            'action_name' => 'om.tencent.qqlivetv.open',
+            'extra' => [
+                ['uri' => 'tenvideo2://?action=1&cover_id=' . $album->album_id . '&pull_from=101503']
+            ]
         ];
     }
 
