@@ -159,13 +159,48 @@ class ApiController extends Controller
     {
         if (preg_match('/^我(要|想)看(\S+)/', $text, $matches) && isset($matches[2])) {
             $key = trim($matches[2]);
-            $channel = HdpChannel::where("name", $key)->first();
-            if ($channel) {
-                $this->backJson['data'] = $this->formatChannel2AI($channel);
+            $channelObjs = HdpChannel::where("name", $key)->get();
+            if ($channelObjs) {
+                $channels = [];
+                foreach ($channelObjs as $key => $channelObj) {
+                    array_push($channels, [
+                        'model' => 'channel',
+                        'name' => $channelObj->name,
+                        'code' => $channelObj->code,
+                        'logo' => $this->getChannelLogo($channelObj->logo),
+                        'tags' => $channelObj->tags,
+                        'hot' => $channelObj->hot,
+                        'targetActions' => $this->getTargetActionObjsByChannelCode($channelObj->code),
+                        'liveProgram' => $this->getLiveProgramByChannelCode($channelObj->code)
+                    ]);
+                }
+                $this->backJson['data'] = $channels;
                 return true;
             }
+            $liveProgramObjs = LiveProgram::where("program_name", $key)->orWhere('wiki_title', $key)->get();
+            if($liveProgramObjs) {
+                $livePrograms = [];
+                foreach ($liveProgramObjs as $key => $liveProgramObj) {
+                    $livePrograms[$key] = [
+                        'model' => 'live',
+                        'programName' => $liveProgramObj->program_name,
+                        'channelCode' => $liveProgramObj->channel_code,
+                        'startTime' => date('Y-m-d H:i:s', $liveProgramObj->start_time),
+                        'endTime' => date('Y-m-d H:i:s', $liveProgramObj->end_time),
+                        'wikiID' => $liveProgramObj->wiki_id,
+                        "wikiTitle" => $liveProgramObj->wiki_title,
+                        "wikiCover" => $this->getWikiCover($liveProgramObj->wiki_cover),
+                        'tags' => $liveProgramObj->tags,
+                        'hot' => $liveProgramObj->hot,
+                        'targetActions' => $this->getTargetActionObjsByChannelCode($liveProgramObj->channel_code),
+                    ];
+                }
+                $this->backJson['data'] = $livePrograms;
+                return true;
+            }
+
             if (preg_match('/^(\S+)第(\S+)(集|期)/', $key, $matches2)) {
-                Log::info($matches2[1] . "\t" . $matches2[2]);
+                //Log::info($matches2[1] . "\t" . $matches2[2]);
                 $key = trim($matches2[1]);
                 $num = Tools::cnNum2Num(trim($matches2[2]));
             } else {
@@ -173,7 +208,6 @@ class ApiController extends Controller
                 $num = null;
             }
             $key = str_replace(['的'] ,'', $key);
-            Log::info($key);
             $xs = new \XS(config_path('./album.ini'));
             $docs = $xs->search->setSort('score')->setLimit(10)->search($key);
             $count = $xs->search->lastCount;
@@ -210,9 +244,19 @@ class ApiController extends Controller
         if (isset($matches[2]) || preg_match('/^我(要|想)打开(\S+)/', $text, $matches)) {
             $key = $matches[2];
             $apps = App::where('name', $key)->get();
-            return $this->formatApp2AI($apps);
+            if(!$apps) {
+                $this->setErrArray(1002, '没有找到你想要的结果!');
+                return false;
+            }
+            $data = [];
+            foreach($apps as $key => $app) {
+                $data[$key][0] = $this->formatApp2AI($app);
+            }
+            $this->backJson['data'] = $data;
+            return true;
         } else {
-            return null;
+            $this->setErrArray(1002, '没有找到你想要的结果!');
+            return false;
         }
     }
 
@@ -220,7 +264,7 @@ class ApiController extends Controller
     {
         return [
             [
-                "type" => "music",
+                "active_model" => "music",
                 "target_type" => "androidApp",
                 'package_name' => 'com.tencent.music'
             ]
@@ -230,6 +274,7 @@ class ApiController extends Controller
     protected function formatChannel2AI($channel)
     {
         return [
+            'active_model' => 'channel',
             'active_type' => 'activity',
             'name' => $channel->name,   //mainActivity,activity,action,broadcast,service,url
             'package_name' => 'hdpfans.com',
@@ -242,8 +287,8 @@ class ApiController extends Controller
 
     protected function formatXsAlbum2AI($doc)
     {
-
         return [
+            'active_model' => 'album',
             'active_type' => 'action',
             'name' => $doc->albumName,
             'verpic' => $doc->albumVerpic,
@@ -260,6 +305,7 @@ class ApiController extends Controller
     {
 
         return [
+            'active_model' => 'album',
             'active_type' => 'action',
             'name' => $album->album_name,
             'package_name' => 'com.ktcp.tvvideo',
@@ -272,8 +318,8 @@ class ApiController extends Controller
 
     protected function formatQQAlbumVideo2AI($video)
     {
-
         return [
+            'active_model' => 'albumVideo',
             'active_type' => 'action',
             'name' => $video->video_name,
             'verpic' => $video->video_verpic,
@@ -286,19 +332,15 @@ class ApiController extends Controller
         ];
     }
 
-    protected function formatApp2AI($apps)
+    protected function formatApp2AI($app)
     {
-        $ai = [];
-        if ($apps) {
-            foreach ($apps as $app) {
-                array_push($ai, [
-                    'name' => $app->name,
-                    'package_name' => $app->package_name,
-                    'version_name' => $app->version_name,
-                ]);
-            }
-        }
-        return $ai;
+        return [
+            'active_model' => 'app',
+            'active_type' => 'mainActivity',
+            'name' => $app->name,
+            'package_name' => $app->package_name,
+            'version_name' => $app->version_name,
+        ];
     }
 
     protected function GetChannelCategory()
