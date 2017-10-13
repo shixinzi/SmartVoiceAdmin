@@ -1,0 +1,16 @@
+新浪接口(ip值为空的时候 获取本地的)
+http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=218.4.255.255
+淘宝接口
+http://ip.taobao.com/service/getIpInfo.php?ip=63.223.108.42
+
+淘宝手机归属查询
+https://tcc.taobao.com/cc/json/mobile_tel_segment.htm?tel=15850781443
+
+有道api接口
+接口地址：http://www.youdao.com/smartresult-xml/search.s?type=mobile&q=13892101112
+
+
+天气预报接口
+http://api.map.baidu.com/telematics/v3/weather?location=%E9%80%9A%E5%B7%9E&output=json&ak=11ffd27d38deda622f51c9d314d46b17
+
+

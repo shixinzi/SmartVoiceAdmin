@@ -59,11 +59,17 @@ class CronUpdateLiveProgram extends Command
                         $liveProgramObj->end_time = $curProgramObj->end_time;
                         if($curProgramObj->wiki_id) {
                             $wikiObj = Wiki::getOneById($curProgramObj->wiki_id);
-                            if($wikiObj) {
-                                $liveProgramObj->wiki_id = $curProgramObj->wiki_id;
-                                $liveProgramObj->wiki_title = $wikiObj->title;
-                                $liveProgramObj->wiki_cover = $wikiObj->cover;
-                            }
+                        } else {
+                            $wikiObj = null;
+                        }
+                        if($wikiObj) {
+                            $liveProgramObj->wiki_id = $curProgramObj->wiki_id;
+                            $liveProgramObj->wiki_title = $wikiObj->title;
+                            $liveProgramObj->wiki_cover = $wikiObj->cover;
+                        } else {
+                            $liveProgramObj->wiki_id = null;
+                            $liveProgramObj->wiki_title = null;
+                            $liveProgramObj->wiki_cover = null;
                         }
                         $liveProgramObj->tags = $curProgramObj->tags;
                         $liveProgramObj->hot = $channelObj->hot;
@@ -91,12 +97,19 @@ class CronUpdateLiveProgram extends Command
                         $liveProgramObj->end_time = $curProgramObj->end_time;
                         if($curProgramObj->wiki_id) {
                             $wikiObj = Wiki::getOneById($curProgramObj->wiki_id);
-                            if($wikiObj) {
-                                $liveProgramObj->wiki_id = $curProgramObj->wiki_id;
-                                $liveProgramObj->wiki_title = $wikiObj->title;
-                                $liveProgramObj->wiki_cover = $wikiObj->cover;
-                            }
+                        } else {
+                            $wikiObj = null;
                         }
+                        if($wikiObj) {
+                            $liveProgramObj->wiki_id = $curProgramObj->wiki_id;
+                            $liveProgramObj->wiki_title = $wikiObj->title;
+                            $liveProgramObj->wiki_cover = $wikiObj->cover;
+                        } else {
+                            $liveProgramObj->wiki_id = null;
+                            $liveProgramObj->wiki_title = null;
+                            $liveProgramObj->wiki_cover = null;
+                        }
+
                         $liveProgramObj->tags = $curProgramObj->tags;
                         $liveProgramObj->hot = $channelObj->hot;
                         $liveProgramObj->save();
