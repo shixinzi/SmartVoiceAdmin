@@ -51,7 +51,9 @@ class CronUpdateLiveProgram extends Command
                     $liveProgramObj = new LiveProgram();
                     $curProgramObj = Program::where('channel_code', $channelObj->code)
                         ->where('start_time', '<', $now)
-                        ->where('end_time' ,'>', $now)->first();
+                        ->where('end_time' ,'>', $now)
+                        ->orderBy('start_time', 'asc')
+                        ->first();
                     if($curProgramObj) {
                         $liveProgramObj->channel_code = $channelObj->code;
                         $liveProgramObj->program_name = $curProgramObj->name;
@@ -89,14 +91,15 @@ class CronUpdateLiveProgram extends Command
                 } else if ($liveProgramObj->end_time < $now){
                     $curProgramObj = Program::where('channel_code', $channelObj->code)
                         ->where('start_time', '<', $now)
-                        ->where('end_time' ,'>', $now)->first();
+                        ->where('end_time' ,'>', $now)
+                        ->orderBy('start_time', 'asc')
+                        ->first();
                     if($curProgramObj) {
                         $liveProgramObj->channel_code = $channelObj->code;
                         $liveProgramObj->program_name = $curProgramObj->name;
                         $liveProgramObj->start_time = $curProgramObj->start_time;
                         $liveProgramObj->end_time = $curProgramObj->end_time;
                         if($curProgramObj->wiki_id) {
-                            \Log::info($curProgramObj->wiki_id);
                             $wikiObj = Wiki::getOneById($curProgramObj->wiki_id);
                         } else {
                             $wikiObj = null;
