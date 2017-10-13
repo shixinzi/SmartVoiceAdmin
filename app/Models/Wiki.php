@@ -34,19 +34,15 @@ class Wiki extends Eloquent
 
     public static function getOneById($id)
     {
-        $id = "541295fa2dd6fc7a0631a644";
         $ckey = 'mWikiGetOne_'.$id;
         if(!Cache::has($ckey)) {
-            Log::debug("222-".$id);
             $wiki = Wiki::find($id);
             if($wiki) {
-                Log::debug("444-".$id);
                 Cache::put($ckey, $wiki, 60);
                 return $wiki;
             }
             return null;
         } else {
-            Log::debug("333-".$id);
             return Cache::get($ckey);
         }
     }

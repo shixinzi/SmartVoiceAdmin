@@ -96,6 +96,7 @@ class CronUpdateLiveProgram extends Command
                         $liveProgramObj->start_time = $curProgramObj->start_time;
                         $liveProgramObj->end_time = $curProgramObj->end_time;
                         if($curProgramObj->wiki_id) {
+                            \Log::info($curProgramObj->wiki_id);
                             $wikiObj = Wiki::getOneById($curProgramObj->wiki_id);
                         } else {
                             $wikiObj = null;
