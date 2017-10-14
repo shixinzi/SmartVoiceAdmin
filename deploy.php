@@ -5,7 +5,8 @@ require 'recipe/laravel.php';
 
 // Configuration
 
-set('repository', 'git@github.com:superwen/SmartVoiceAdmin.git');
+// set('repository', 'git@github.com:superwen/SmartVoiceAdmin.git');
+set('repository', 'https://gitee.com/subowen/SmartVoiceAdmin.git');
 set('git_tty', true);
 add('shared_files', []);
 add('shared_dirs', []);

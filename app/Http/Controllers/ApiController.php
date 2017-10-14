@@ -126,6 +126,7 @@ class ApiController extends Controller
         $pregMatchs = [
             '/^我(要|想)看(\S+)/' => "searchTVAndVod",
             '/^我(要|想)打开(\S+)/' => "searchApp",
+            '/^我(要|想)安装(\S+)/' => "searchApp",
             '/^我(要|想)听(\S+)/' => "searchMusic",
         ];
 
